@@ -1,0 +1,25 @@
+#!/bin/bash
+# name   : qvm-xclip
+# purpose: Copy the clipboard of dom0 to the clipboard of an appvm or vica versa
+# Usage  : qvm-xclip to|from <AppVM>
+
+case "$1" in
+  'to')
+    xclip -o | qvm-run --pass-io $2 'cat | xclip -selection clipboard &>/dev/null' 
+    notify-send --urgency low --icon image --expire-time=5000 "$0" "Clipboard copied from dom0 to $2"
+    ;;
+
+  'from')
+    qvm-run --pass-io $2 'xclip -o' | xclip -selection clipboard &>/dev/null
+    notify-send --urgency low --icon image --expire-time=5000 "$0" "Clipboard copied from $2 to dom0"
+    ;;
+
+  *)
+    echo
+    echo "Usage: qvm-xclip to|from <APPVM>"
+    echo
+    echo "    to   <APPVM> : copy the clipboard from the AppVM to dom0"
+    echo "    from <APPVM> : copy the clipboard from dom0 to the AppVM to dom0"
+    echo
+    ;;
+esac

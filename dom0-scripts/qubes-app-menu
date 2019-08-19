@@ -1,0 +1,43 @@
+#!/bin/bash
+# name   : qubes-app-menu
+# purpose: Hiddes menus from the qubes menu for AppVMs 
+# Usage  : qubes-app-menu  hide|unhide <AppVM>
+# Link   : https://github.com/one7two99/my-qubes/blob/master/dom0/qubes-app-menu
+
+cmd=$1
+HiddenAppMenuFolder=~/hidden-dom0-applications
+AppMenuFolder=~/.local/share/applications
+
+#check if $2 is set
+if [[ -n "$2" ]]; then
+   AppVM=$2
+else
+   cmd=0  
+fi
+case "$cmd" in
+  'hide')
+    mkdir -p $HiddenAppMenuFolder/$AppVM
+    mv $AppMenuFolder/$AppVM-* $HiddenAppMenuFolder/$AppVM
+    echo "Apps for $2 hidden from Qubes Menu" && echo
+    #notify-send --urgency low --icon image --expire-time=5000 "$0" "Apps for $2 hidden from Qubes Menu"
+    ;;
+
+  'unhide')
+    mv $HiddenAppMenuFolder/$AppVM/* $AppMenuFolder
+    rmdir $HiddenAppMenuFolder/$AppVM/
+    echo "Apps for $2 viewable in Qubes Menu" && echo
+    #notify-send --urgency low --icon image --expire-time=5000 "$0" "Apps for $2 viewable in Qubes Menu"
+    ;;
+
+  *)
+    echo
+    echo "Usage: qubes-app-menu hide|unhide <APPVM>"
+    echo
+    echo "    hide   <APPVM> : Hide the app menu entries for an AppVM"
+    echo "    unhide <APPVM> : Show the app menu entries for an AppVM"
+    echo
+    echo "Currently hidden AppMenus:"
+    cd $HiddenAppMenuFolder && ls -1 
+    echo
+    ;;
+esac

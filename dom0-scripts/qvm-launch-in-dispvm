@@ -1,0 +1,6 @@
+#!/bin/bash
+# name   : qvm-launch-in-dispvm
+# purpose: Launched a command in an already running dispvm
+# Usage  : qvm-launch-in-dispvm <COMMAND>
+
+qvm-run `xl list | grep disp | gawk '{ print $1 }'` $1

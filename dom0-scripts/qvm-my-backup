@@ -1,0 +1,48 @@
+#!/bin/bash
+# qvm-my-backup
+# A backup script to backup VMs by application type
+
+PassphraseFile=~/.backup-passphrase
+DefaultBackupLocation=/run/media/user/EXTERNALDRIVE/Backup/Qubes/x230-i7
+DefaultBackupVM=sys-usb
+
+if [[ -n "$1" ]]; then
+  AppVMType=$1
+else
+  AppVMType=0
+fi
+if [[ -n "$2" ]]; then
+  DestAppVM=$2
+else
+  DestAppVM=$DefaultBackupVM
+fi
+if [[ -n "$3" ]]; then
+  BackupLocation=$3
+else
+  BackupLocation=$DefaultBackupLocation/$AppVMType
+fi
+
+case "$AppVMType" in
+  '0')
+    echo
+    echo "Missing command line arguments:"
+    echo "Usage: qvm-my-backup AppVM|TemplateVM|StandaloneVM|AdminVM <BackupVM> <BackupLocation> <ExcludedVM>"
+    echo
+    ;;
+
+  *)
+    qvm-shutdown --all --wait --exclude $DestAppVM
+    ListOfVMs=`qvm-ls | grep $AppVMType | gawk '{print $1}' | paste -s -d " "`
+    echo
+    echo "Source VMs      : $ListOfVMs"
+    echo "Backup VM       : $DestAppVM"
+    echo "Backup Directory: $BackupLocation"
+    echo
+    qvm-backup --verbose \
+        --dest-vm $DestAppVM \
+        --passphrase-file $PassphraseFile \
+        --compress $BackupLocation \
+        `qvm-ls | grep $AppVMType | gawk '{print $1}' | paste -s`
+    ;;
+esac
+
