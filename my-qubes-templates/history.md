@@ -160,23 +160,26 @@ qvm-shutdown --wait $appvm
 qvm-create --template=$template --label=black $appvm
 qvm-prefs --set $appvm template $template
 
+# Hint: install pinentry-gtk in template VM
+echo "pinentry-program /usr/bin/pinentry-gtk" > ~/.gnupg/gpg-agent.conf
+gpg-connect-agent reloadagent /bye
+
+
 
 # Disable networking
 qvm-prefs --set $appvm netvm ""
 
-To allow access to Vault-VM without user-dialog:
+# To allow access to Vault-VM without user-dialog:
+nano /etc/qubes-rpc/policy/qubes.Gpg
 
-`nano /etc/qubes-rpc/policy/qubes.Gpg`
-
-add:
+#add:
 my-untrusted my-vault allow
 $anyvm $anyvm ask
 
-Configure Vault-VM in the AppVMs
-```
+#Configure Vault-VM in the AppVMs
 sudo bash
 echo "my-vault" > /rw/config/gpg-split-domain
-```
+
 
 ===================
  t-fedora-29-media -> ok
@@ -211,16 +214,37 @@ qvm-create --template=$TemplateName --label=orange $AppVMName
  Disposable VM -> ok
 ===============
 
-dvmtemplate=t-fedora-29-apps
-dvmappvm=my-dvm
-qvm-create --template $dvmtemplate --label red $dvmappvm
-qvm-prefs $dvmappvm template_for_dispvms True
-qubes-prefs --set default_dispvm $dvmappvm
-qvm-features $dvmappvm appmenus-dispvm 1
+# Create a new Disposable App-VM which is based on a custom template t-fedora-2
+template4dvm=t-fedora-29-apps
+newdvmtemplatename=my-dvm
+qvm-create --template $template4dvm --label red --property template_for_dispvms=True --class=AppVM $newdvmtemplatename
+ 
+# Fix menu entry from Domain: my-dvm to Disposable: my-dvm
+# https://groups.google.com/forum/#!msg/qubes-users/gfBfqTNzUIg/sbPp-pyiCAAJ
+# https://github.com/QubesOS/qubes-issues/issues/1339#issuecomment-338813581
+qvm-features $newdvmtemplatename appmenus-dispvm 1
+qvm-sync-appmenus --regenerate-only $newdvmtemplatename
 
-# remove old dvm
+# Set default DispVM for qubes
+qubes-prefs --set default_dispvm $newdvmtemplatename
+
+###usefull commands
+# remove old dvm, change all references to this VM before in the Qubes settings
 qvm-prefs fedora-26 installed_by_rpm false
 qvm-remove fedora-26
+
+# Change the Disp-VM from an AppVM (here: my-untrusted)
+appvmname=my-untrusted
+qvm-prefs --set $appvmname default_dispvm $newdvmtemplatename
+ 
+# Try to start something from this AppVM in a disposable VM
+qvm-run --auto $appvmname 'qvm-open-in-dvm https:/google.de'
+
+# This should start a new dispvm which is based on your dvm-App
+# Check the template on which the dispvm is based on in dom0
+qvm-ls | grep disp
+
+
 
 
 

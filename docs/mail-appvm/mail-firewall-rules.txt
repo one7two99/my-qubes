@@ -1,0 +1,64 @@
+
+#show default policy
+iptables -L -v | grep policy
+
+# delete all rules
+iptables -t filter -F
+
+# change default policy to drop
+iptables -P INPUT DROP
+iptables -P OUTPUT DROP
+iptables -P FORWARD DROP
+
+# allow DNS to 10.137.1.1
+iptables -A OUTPUT -p udp -d 10.139.1.1 --dport 53 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT  -p udp -s 10.139.1.1 --sport 53 -m conntrack --ctstate ESTABLISHED     -j ACCEPT
+iptables -A OUTPUT -p tcp -d 10.139.1.1 --dport 53 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p tcp -s 10.139.1.1 --sport 53 -m conntrack --ctstate ESTABLISHED -j ACCEPT
+
+# Allow outgoing ping/echo
+iptables -A OUTPUT -p icmp --icmp-type 8 -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p icmp --icmp-type 0 -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+### allow IMAP
+# Gmail IMAP
+iptables -A OUTPUT -p tcp -d 108.177.96.0/19 --dport 993 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p tcp -s 108.177.96.0/19 --sport 993 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -p tcp -d 74.125.0.0/16 --dport 993 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p tcp -s 74.125.0.0/16 --sport 993 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -p tcp -d 64.233.160.0/19 --dport 993 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p tcp -s 64.233.160.0/19 --sport 993 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -p tcp -d 108.177.8.0/21 --dport 993 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p tcp -s 108.177.8.0/21 --sport 993 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -p tcp -d 173.194.0.0/16 --dport 993 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p tcp -s 173.194.0.0/16 --sport 993 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -p tcp -d 66.102.0.0/20 --dport 993 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p tcp -s 66.102.0.0/20 --sport 993 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+# Outlook IMAP
+iptables -A OUTPUT -p tcp -d 40.96.0.0/13 --dport 993 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p tcp -s 40.96.0.0/13 --sport 993 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+### allow SMTP 
+#Gmail SMTP
+iptables -A OUTPUT -p tcp -d 74.125.0.0/16 --dport 587 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p tcp -s 74.125.0.0/16 --sport 587 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -p tcp -d 108.177.8.0/21 --dport 587 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p tcp -s 108.177.8.0/21 --sport 587 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -p tcp -d 108.177.96.0/19 --dport 587 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p tcp -s 108.177.96.0/19 --sport 587 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+#Outlook SMTP
+iptables -A OUTPUT -p tcp -d 40.96.0.0/13 --dport 587 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p tcp -s 40.96.0.0/13 --sport 587 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+# allow everything for localhost
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
+
+==============================================================================
+==============================================================================
+
+iptables -P FORWARD DROP
+iptables -P OUTPUT DROP
+
+clear && iptables --table filter --list -n
+
