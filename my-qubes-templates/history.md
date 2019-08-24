@@ -245,6 +245,8 @@ qvm-run --auto $appvmname 'qvm-open-in-dvm https:/google.de'
 qvm-ls | grep disp
 
 
+#Start an App in a DispVM from dom0
+qvm-run --dispvm=<DISPVM> --service qubes.StartApp+<COMMAND>
 
 
 
