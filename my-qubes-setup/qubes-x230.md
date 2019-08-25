@@ -17,6 +17,7 @@ this page lists all devices in the lenovo x230 which you can attach to your AppV
 - 00:1b.0 Audio device: Intel Corporation 7 Series/C216 Chipset Family High Definition Audio Controller (rev 04)
 - 02:00.0 System peripheral: Ricoh Co Ltd PCIe SDXC/MMC Host Controller (rev 07)
 - 03:00.0 Network controller: Intel Corporation Centrino Advanced-N 6205 [Taylor Peak] (rev 34)
+You can find the Linux packages for your Wifi Card here: https://www.intel.de/content/www/de/de/support/articles/000005511/network-and-i-o/wireless-networking.html. For this Wifi card you need the package named: iwlwifi-6000g2a
 - 00:19.0 Ethernet controller: Intel Corporation 82579LM Gigabit Network Connection (Lewisville) (rev 04)
 
 
