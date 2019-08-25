@@ -85,15 +85,20 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'dnf update -y'
 
 # Install required packages for Sys-VMs
-# See Wifi Drivers: https://www.intel.de/content/www/de/de/support/articles/000005511/network-and-i-o/wireless-networking.html
-# Wifi Drivers: W540 = iwl7260 / X230 = iwl6000g2a
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'dnf -y install qubes-core-agent-qrexec qubes-core-agent-systemd \
   qubes-core-agent-networking polkit qubes-core-agent-network-manager \
   notification-daemon qubes-core-agent-dom0-updates qubes-usb-proxy \
-  iwl6000g2a-firmware iwl7260-firmware qubes-input-proxy-sender iproute iputils \
+  qubes-input-proxy-sender iproute iputils \
   NetworkManager-openvpn NetworkManager-openvpn-gnome \
   NetworkManager-wwan NetworkManager-wifi network-manager-applet'
+
+# See Wifi Drivers: https://www.intel.de/content/www/de/de/support/articles/000005511/network-and-i-o/wireless-networking.html
+# Wifi Drivers: 
+# W540 = iwl7260 (iwl7260-firmware)
+# X230 = iwl6000g2a (iwl6000g2a-firmware)
+qvm-run --auto --user root --pass-io --no-gui $systemplate \
+  'dnf -y install iwl6000g2a-firmware'
 
 # Optional packages you might want to install in the sys-template:
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
