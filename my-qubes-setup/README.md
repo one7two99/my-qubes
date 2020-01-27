@@ -42,6 +42,27 @@ It is also the last X-series laptop which supports CoreBoot and therefore I will
 - Qubes 4.1
 - Windows 10 Enteprise (DualBoot, BitLocker enabled)
 
+PCI devices (lspci)
+
+00:00.0 Host bridge: Intel Corporation 3rd Gen Core processor DRAM Controller (rev 09)
+00:02.0 VGA compatible controller: Intel Corporation 3rd Gen Core processor Graphics Controller (rev 09)
+00:14.0 USB controller: Intel Corporation 7 Series/C210 Series Chipset Family USB xHCI Host Controller (rev 04)
+00:16.0 Communication controller: Intel Corporation 7 Series/C216 Chipset Family MEI Controller #1 (rev 04)
+00:19.0 Ethernet controller: Intel Corporation 82579LM Gigabit Network Connection (Lewisville) (rev 04)
+00:1a.0 USB controller: Intel Corporation 7 Series/C216 Chipset Family USB Enhanced Host Controller #2 (rev 04)
+00:1b.0 Audio device: Intel Corporation 7 Series/C216 Chipset Family High Definition Audio Controller (rev 04)
+00:1c.0 PCI bridge: Intel Corporation 7 Series/C216 Chipset Family PCI Express Root Port 1 (rev c4)
+00:1c.1 PCI bridge: Intel Corporation 7 Series/C210 Series Chipset Family PCI Express Root Port 2 (rev c4)
+00:1d.0 USB controller: Intel Corporation 7 Series/C216 Chipset Family USB Enhanced Host Controller #1 (rev 04)
+00:1f.0 ISA bridge: Intel Corporation QM77 Express Chipset LPC Controller (rev 04)
+00:1f.2 SATA controller: Intel Corporation 7 Series Chipset Family 6-port SATA Controller [AHCI mode] (rev 04)
+00:1f.3 SMBus: Intel Corporation 7 Series/C216 Chipset Family SMBus Controller (rev 04)
+02:00.0 System peripheral: Ricoh Co Ltd PCIe SDXC/MMC Host Controller (rev 07)
+03:00.0 Network controller: Intel Corporation Centrino Advanced-N 6205 [Taylor Peak] (rev 34)
+
+Wifi driver in sys-net: iwl6000g2a-firmware
+
+
 ## The work horse -> Lenovo W540
 not very often in use, as the X230 is so versatile and the W540 doesn't run with Coreboot and has a much shorter battery runtime.
 
@@ -61,49 +82,75 @@ But as we are able to use virtual desktops, if I need windows, I connect to my c
 
 
 ## My currently installed AppVMs and Templates
-### My Disposable AppVMs
+
+### TemplateVMs (default)
 ```
-NAME                   STATE    CLASS       LABEL   TEMPLATE               NETVM
-----------------------------------------------------------------------------------------
-whonix-ws-14-dvm       Halted   AppVM       red     whonix-ws-14           sys-whonix
-my-dvm                 Halted   AppVM       red     t-fedora-29-apps       sys-firewall
+NAME               STATE    CLASS         LABEL   TEMPLATE           NETVM
+debian-9           Halted   TemplateVM    black   -                  -
+fedora-30          Halted   TemplateVM    black   -                  -
+fedora-30-minimal  Halted   TemplateVM    black   -                  -
+whonix-gw-14       Halted   TemplateVM    black   -                  -
+whonix-ws-14       Halted   TemplateVM    black   -                  -
 ```
-### My regular AppVMs
+### TemplateVMs (custom build)
 ```
-NAME                   STATE    CLASS       LABEL   TEMPLATE               NETVM
-----------------------------------------------------------------------------------------
-anon-whonix            Halted   AppVM       red     whonix-ws-14           sys-whonix
-my-bizmail             Halted   AppVM       yellow  t-fedora-29-mail       sys-firewall
-my-browsing            Halted   AppVM       blue    t-fedora-29-apps       sys-vpn
-my-corporate           Halted   AppVM       green   t-fedora-29-work       sys-firewall
-my-multimedia          Halted   AppVM       orange  t-fedora-29-media      sys-firewall
-my-privmail            Halted   AppVM       blue    t-fedora-29-mail       sys-firewall
-my-storage-datastore   Halted   AppVM       gray    t-fedora-29-storage    sys-firewall
-my-untrusted           Halted   AppVM       orange  t-fedora-29-apps       sys-firewall
-my-vault               Halted   AppVM       black   t-fedora-29-apps       -
+NAME               STATE    CLASS         LABEL   TEMPLATE           NETVM
+t-fedora-30-apps   Halted   TemplateVM    black   -                  -
+t-fedora-30-mail   Halted   TemplateVM    black   -                  -
+t-fedora-30-media  Halted   TemplateVM    black   -                  -
+t-fedora-30-sys    Halted   TemplateVM    black   -                  -
+t-fedora-30-work   Halted   TemplateVM    black   -                  -
 ```
-### My Sys-AppVMs
+
+### StandaloneVMs
 ```
-NAME                   STATE    CLASS       LABEL   TEMPLATE               NETVM
-sys-firewall           Running  AppVM       red     t-fedora-29-sys        sys-net
-sys-net                Running  AppVM       red     t-fedora-29-sys        -
-sys-usb                Running  AppVM       red     t-fedora-29-sys        -
-sys-vpn                Running  AppVM       orange  t-fedora-29-sys        sys-net
-sys-whonix             Halted   AppVM       black   whonix-gw-14           sys-vpn
+NAME               STATE    CLASS         LABEL   TEMPLATE           NETVM
+my-win7            Halted   StandaloneVM  gray    -                  sys-mirage-fw
+sys-mirage-fw      Running  StandaloneVM  green   -                  sys-vpn
 ```
-### My templates
+
+### AppVMs
 ```
-NAME                   STATE    CLASS       LABEL   TEMPLATE               NETVM
-fedora-29-minimal      Halted   TemplateVM  black   -                      -
-t-fedora-29-media      Halted   TemplateVM  black   -                      -
-t-fedora-20-apps       Halted   TemplateVM  black   -                      -
-t-fedora-29-mail       Halted   TemplateVM  black   -                      -
-t-fedora-29-storage    Halted   TemplateVM  black   -                      -
-t-fedora-29-sys        Halted   TemplateVM  black   -                      -
-t-fedora-29-work       Halted   TemplateVM  black   -                      -
-whonix-gw-14           Halted   TemplateVM  black   -                      -
-whonix-ws-14           Halted   TemplateVM  black   -                      -
+NAME               STATE    CLASS         LABEL   TEMPLATE           NETVM
+anon-whonix        Halted   AppVM         red     whonix-ws-14       sys-whonix
+my-aboutprivacy    Halted   AppVM         blue    t-fedora-30-apps   sys-mirage-fw
+my-bizmail         Halted   AppVM         blue    t-fedora-30-mail   sys-mirage-fw
+my-globits         Halted   AppVM         blue    t-fedora-30-work   sys-mirage-fw
+my-media           Halted   AppVM         orange  t-fedora-30-media  sys-firewall
+my-privmail        Halted   AppVM         blue    t-fedora-30-mail   sys-mirage-fw
+my-storage         Running  AppVM         green   fedora-30          sys-mirage-fw
+my-untrusted       Halted   AppVM         orange  t-fedora-30-apps   sys-mirage-fw
+my-vault           Halted   AppVM         black   t-fedora-30-apps   -
+
+### SysVMs
 ```
+NAME               STATE    CLASS         LABEL   TEMPLATE           NETVM
+default-mgmt-dvm   Halted   AppVM         black   fedora-30          -
+sys-firewall       Halted   AppVM         red     t-fedora-30-sys    sys-net
+sys-net            Running  AppVM         red     t-fedora-30-sys    -
+sys-usb            Running  AppVM         red     t-fedora-30-sys    -
+sys-vpn            Running  AppVM         blue    t-fedora-30-sys    sys-net
+sys-whonix         Halted   AppVM         black   whonix-gw-14       sys-mirage-fw
+```
+
+### Disposable AppVMs
+```
+NAME               STATE    CLASS         LABEL   TEMPLATE           NETVM
+my-dvm             Halted   AppVM         red     t-fedora-30-apps   sys-mirage-fw
+whonix-ws-14-dvm   Halted   AppVM         red     whonix-ws-14       sys-whonix
+```
+
+
+## System defaults
+
+Dom0 UpdateVM: sys-firewall
+ClockVM: sys-net
+Default NetVM: sys-mirage-fw
+Default template: t-fedora-30-apps
+Default DispVM: my-dvm
+
+
+
 
 --------
 # My Templates
