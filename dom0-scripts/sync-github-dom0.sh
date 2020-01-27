@@ -13,7 +13,7 @@ case "$1" in
   # Clone repository to a /tmp location in AppVM
   qvm-run --pass-io --no-gui $AppVM \
     "mkdir -p /tmp/repo && cd /tmp/repo && \
-     git clone git@github.com:$GithubAccount/$GithubRepo.git"
+     git clone https://github.com/$GithubAccount/$GithubRepo.git"
 
   # Copy data to dom0
   rm -Rf ~/$GithubRepo
