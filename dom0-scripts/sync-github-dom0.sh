@@ -39,6 +39,10 @@ case "$1" in
      git status && \
      git commit -a -m Upload && \
      git push"
+
+  # Remove temporary repository
+  qvm-run --pass-io --no-gui $AppVM \
+    "rm -Rf /tmp/repo"
   ;;
 
 *)
