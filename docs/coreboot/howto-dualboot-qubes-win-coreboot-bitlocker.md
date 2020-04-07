@@ -4,7 +4,7 @@ How to install Qubes OS + Windows 10 + Coreboot + BitLocker-encryption with Boot
 
 ```
 [x] Windows installieren ohne BitLocker (!)
-[x] EasyBCD installieren
+[x] EasyBCD https://neosmart.net/EasyBCD/ installieren
 [x] Gruppenrichtlinie bearbeiten
 	Administrative Vorlagen > Windows Komponenten > Bitlocker-Laufwerksverschlüsselung > Betriebssystemlaufwerke
 	[x] Zusätzliche Authentifizierung beim Start anfordern -> Systemstart-PIN bei Systemstart zulassen
