@@ -1,7 +1,6 @@
-=================
  t-fedora-30-sys -> ok
 =================
-
+```
 template=fedora-30-minimal
 systemplate=t-fedora-30-sys
 
@@ -28,10 +27,10 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
 
 # See Wifi Drivers: https://www.intel.de/content/www/de/de/support/articles/000005511/network-and-i-o/wireless-networking.html
 # Wifi Drivers: 
-# W540 = iwl7260 (iwl7260-firmware)
-# X230 = iwl6000g2a (iwl6000g2a-firmware)
+#    W540 = iwl7260 (iwl7260-firmware)
+#    X230 = iwl6000g2a (iwl6000g2a-firmware)
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
-  'dnf -y install iwl6000g2a-firmware'
+  'dnf -y install iwl6000g2a-firmware iwl7260-firmware'
 
 # Optional packages you might want to install in the sys-template:
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
@@ -51,3 +50,4 @@ qvm-prefs --set sys-usb template $systemplate
 qvm-prefs --set sys-net template $systemplate
 qvm-prefs --set sys-firewall template $systemplate
 #qvm-prefs --set sys-vpn template $systemplate
+```
