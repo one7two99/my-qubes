@@ -14,8 +14,6 @@ qvm-clone $template $systemplate
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'dnf update -y'
 
-# 25.08.19 gives error for package: initscripts
-
 # Install required packages for Sys-VMs
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'dnf -y install qubes-core-agent-qrexec qubes-core-agent-systemd \
@@ -25,8 +23,8 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
   NetworkManager-openvpn NetworkManager-openvpn-gnome \
   NetworkManager-wwan NetworkManager-wifi network-manager-applet'
 
-# See Wifi Drivers: https://www.intel.de/content/www/de/de/support/articles/000005511/network-and-i-o/wireless-networking.html
-# Wifi Drivers: 
+# See Wifi Drivers:
+# https://www.intel.de/content/www/de/de/support/articles/000005511/network-and-i-o/wireless-networking.html
 #    W540 = iwl7260 (iwl7260-firmware)
 #    X230 = iwl6000g2a (iwl6000g2a-firmware)
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
