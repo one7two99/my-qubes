@@ -31,7 +31,7 @@ case "$1" in
     "mkdir -p /tmp/repo && cd /tmp/repo && \
      git clone git@github.com:$GithubAccount/$GithubRepo.git"
 
-  tar -czf - ./$GithubRepo | qvm-run --pass-io --no-gui $AppVM "tar xvfz - -C /tmp/repo"
+  ### tar -czf - ./$GithubRepo | qvm-run --pass-io --no-gui $AppVM "tar xvfz - -C /tmp/repo"
 
   qvm-run --pass-io --no-gui $AppVM \
     "cd /tmp/repo/$GithubRepo && \
