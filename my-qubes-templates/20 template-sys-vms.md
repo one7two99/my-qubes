@@ -48,4 +48,40 @@ qvm-prefs --set sys-usb template $systemplate
 qvm-prefs --set sys-net template $systemplate
 qvm-prefs --set sys-firewall template $systemplate
 #qvm-prefs --set sys-vpn template $systemplate
+
+
+
+
+#========
+
+# Update template
+qvm-run --auto --user root --pass-io --no-gui $template   'dnf update -y'
+
+#clone template
+qvm-clone $template $systemplate
+
+
+
+# Install apps gor Network VM            
+qvm-run --auto --user root --pass-io --no-gui $systemplate \
+  'dnf -y install NetworkManager NetworkManager-wifi network-manager-applet \
+  wireless-tools dbus-x11 tar tinyproxy iptables usbutils \
+  NetworkManager-openconnect NetworkManager-openconnect-gnome \
+  NetworkManager-openvpn NetworkManager-openvpn-gnome \
+  NetworkManager-wwan usb_modeswitch modem-manager-gui \
+  pciutils nano less psmisc qubes-core-agent-networking iproute \
+  qubes-core-agent-dom0-updates qubes-core-agent-network-manager \
+  notification-daemon gnome-keyring polkit @hardware-support \
+  tcpdump telnet nmap nmap-ncat qubes-usb-proxy qubes-input-proxy-sender \
+  iwl6000g2a-firmware iwl7260-firmware qubes-menus qubes-gpg-split'
+
+# Set new template as template for sys-vms
+qvm-shutdown --all --wait --timeout 120
+qvm-prefs --set sys-usb template $systemplate
+qvm-prefs --set sys-net template $systemplate
+qvm-prefs --set sys-firewall template $systemplate
+#qvm-prefs --set sys-vpn template $systemplate
+
+
+
 ```
