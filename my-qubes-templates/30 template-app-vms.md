@@ -1,9 +1,9 @@
 ==================
- t-fedora-30-apps -> ok
+ t-fedora-32-apps -> ok
 ==================
 
-Template=fedora-30-minimal
-TemplateName=t-fedora-30-apps
+Template=fedora-32-minimal
+TemplateName=t-fedora-32-apps
 qvm-kill $TemplateName
 qvm-remove --force $TemplateName
 qvm-start --skip-if-running sys-firewall
@@ -27,7 +27,7 @@ qvm-run --auto --pass-io --no-gui --user root $TemplateName \
   nautilus wget qubes-core-agent-nautilus gnome-terminal-nautilus evince \
   polkit e2fsprogs gnome-terminal terminus-fonts dejavu-sans-fonts \
   dejavu-sans-mono-fonts xclip pinentry-gtk \
-  evince-nautilus nautilus-sendto nautilus-pastebin nautilus-search-tool'
+  evince-nautilus nautilus-sendto nautilus-search-tool'
 
 qvm-shutdown --wait $TemplateName
 
