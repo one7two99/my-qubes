@@ -2,6 +2,7 @@
 # name   : copy-github-dom0
 # purpose: Copies a github-repository to dom0 and vica versa
 # Usage  : copy-github-dom0 - options are set in this script
+# Author : one7two99@gmail.com
  
 AppVM=my-untrusted
 GithubAccount=one7two99
@@ -30,6 +31,10 @@ case "$1" in
   qvm-run --pass-io --no-gui $AppVM \
     "mkdir -p /tmp/repo && cd /tmp/repo && \
      git clone git@github.com:$GithubAccount/$GithubRepo.git"
+
+   cd ~/
+   tar -czf - ~/$GithubRepo | qvm-run --pass-io --no-gui $AppVM "tar -xvzf - -C /tmp/repo"
+
 
   qvm-run --pass-io --no-gui $AppVM \
     "cd /tmp/repo/$GithubRepo && \
