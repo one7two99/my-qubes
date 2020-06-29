@@ -1,8 +1,8 @@
- t-fedora-30-sys -> ok
+ t-fedora-32-sys -> ok
 =================
 ```
-template=fedora-30-minimal
-systemplate=t-fedora-30-sys
+template=fedora-32-minimal
+systemplate=t-fedora-32-sys
 
 #remove old template
 qvm-kill $systemplate
@@ -59,8 +59,6 @@ qvm-run --auto --user root --pass-io --no-gui $template   'dnf update -y'
 
 #clone template
 qvm-clone $template $systemplate
-
-
 
 # Install apps gor Network VM            
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
