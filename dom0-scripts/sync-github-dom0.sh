@@ -1,6 +1,6 @@
 #!/bin/bash
-# name   : copy-github-dom0
-# purpose: Copies a github-repository to dom0 and vica versa
+# Name   : copy-github-dom0
+# Purpose: Copies a github-repository to dom0 and vica versa
 # Usage  : copy-github-dom0 - options are set in this script
 # Author : one7two99@gmail.com
 # Date   : 29.06.20
