@@ -14,15 +14,6 @@ qvm-clone $template $systemplate
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'dnf update -y'
 
-# Install required packages for Sys-VMs
-qvm-run --auto --user root --pass-io --no-gui $systemplate \
-  'dnf -y install qubes-core-agent-qrexec qubes-core-agent-systemd \
-  qubes-core-agent-networking polkit qubes-core-agent-network-manager \
-  notification-daemon qubes-core-agent-dom0-updates qubes-usb-proxy \
-  qubes-input-proxy-sender iproute iputils \
-  NetworkManager-openvpn NetworkManager-openvpn-gnome \
-  NetworkManager-wwan NetworkManager-wifi network-manager-applet'
-
 # See Wifi Drivers:
 # https://www.intel.de/content/www/de/de/support/articles/000005511/network-and-i-o/wireless-networking.html
 #    W540 = iwl7260 (iwl7260-firmware)
@@ -34,23 +25,10 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'dnf -y install nano less pciutils xclip git unzip wget'
 
-qvm-run --auto --user root --pass-io --no-gui $systemplate \
-  'dnf -y install qubes-core-agent-passwordless-root'
-
 # Nice(r) Gnome-Terminal compared to xterm
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'dnf -y install gnome-terminal terminus-fonts dejavu-sans-fonts \
    dejavu-sans-mono-fonts'
-
-# Set new template as template for sys-vms
-qvm-shutdown --all --wait --timeout 120
-qvm-prefs --set sys-usb template $systemplate
-qvm-prefs --set sys-net template $systemplate
-qvm-prefs --set sys-firewall template $systemplate
-#qvm-prefs --set sys-vpn template $systemplate
-
-
-
 
 #========
 
