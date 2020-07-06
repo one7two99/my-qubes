@@ -1,6 +1,6 @@
 ```
 MirageFWBuildVM=my-mirage-buildvm
-TemplateVM=fedora-32-minimal
+TemplateVM=fedora-32
 MirageFWAppVM=sys-mirage-fw
 
 See also https://github.com/mirage/qubes-mirage-firewall
@@ -13,25 +13,39 @@ qvm-create $MirageFWBuildVM --class=AppVM --label=red --template=$TemplateVM
 qvm-volume resize $MirageFWBuildVM:private 10GB
 
 # Create a symbolic link to safe docker into the home directory
-qvm-run --auto --pass-io --no-gui $MirageFWBuildVM \
-  'sudo mkdir /home/user/docker && \
-   sudo ln -s /home/user/docker /var/lib/docker'
+qvm-run --auto --pass-io --no-gui --user=root $MirageFWBuildVM \
+  'mkdir /home/user/docker && \
+   ln -s /home/user/docker /var/lib/docker'
 
 # Install docker and git ~2min
-qvm-run --pass-io --no-gui $MirageFWBuildVM \
-  'sudo qvm-sync-clock && \
-   sudo dnf -y install docker git'
+qvm-run --pass-io --no-gui --user=root $MirageFWBuildVM \
+  'qvm-sync-clock && \
+   dnf -y install docker git'
 
 # Launch docker
-qvm-run --pass-io --no-gui $MirageFWBuildVM \
-  'sudo systemctl start docker'
+qvm-run --pass-io --no-gui --user=root $MirageFWBuildVM \
+  'systemctl start docker'
 
+- - - 8< - - - 
 # Download and build mirage for qubes ~11min
 qvm-run --pass-io --no-gui $MirageFWBuildVM \
   'git clone https://github.com/mirage/qubes-mirage-firewall.git && \
    cd qubes-mirage-firewall && \
    # git pull origin pull/52/head && \
    sudo ./build-with-docker.sh'
+- - - 8< - - - 
+
+
+# Download and build mirage for qubes ~11min
+qvm-run --pass-io --no-gui $MirageFWBuildVM \
+  'git clone https://github.com/mirage/qubes-mirage-firewall.git'
+
+
+# build mirage for qubes
+qvm-run --pass-io --no-gui --user=root $MirageFWBuildVM \
+   'cd /home/user/qubes-mirage-firewall && \
+   sudo ./build-with-docker.sh'
+
 
 # Copy the new kernel to dom0
 cd /var/lib/qubes/vm-kernels
