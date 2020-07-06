@@ -1,10 +1,6 @@
-# Launch docker
-qvm-run --pass-io --no-gui $MirageFWBuildVM \
-  'sudo systemctl start docker'
-
 ```
 MirageFWBuildVM=my-mirage-buildvm
-TemplateVM=fedora-30
+TemplateVM=fedora-32-minimal
 MirageFWAppVM=sys-mirage-fw
 
 See also https://github.com/mirage/qubes-mirage-firewall
