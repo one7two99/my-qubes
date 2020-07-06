@@ -11,15 +11,6 @@ qvm-clone $Template $TemplateName
 qvm-run --auto --pass-io --no-gui --user root $TemplateName \
   'dnf -y update'
 
-Error-Message:
-Failed:
-  initscripts-10.02-1.fc30.x86_64
-
-# install a missing package for fedora-29-minimal
-# without it, gui-apps will not start
-# qvm-run --auto --user root --pass-io --no-gui $systemplate \
-#  'dnf install -y e2fsprogs'
-
 qvm-run --auto --pass-io --no-gui --user root $TemplateName \
   'dnf install -y emacs keepass klavaro libreoffice gedit gimp \
   firefox qubes-usb-proxy pulseaudio-qubes nano git transmission mc \
