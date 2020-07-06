@@ -10,35 +10,16 @@ qvm-remove -f $systemplate
 
 #clone template
 qvm-clone $template $systemplate
+
 # update template
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'dnf update -y'
 
+# packages for sys-VMs inluding some tools
 # See Wifi Drivers:
 # https://www.intel.de/content/www/de/de/support/articles/000005511/network-and-i-o/wireless-networking.html
 #    W540 = iwl7260 (iwl7260-firmware)
 #    X230 = iwl6000g2a (iwl6000g2a-firmware)
-qvm-run --auto --user root --pass-io --no-gui $systemplate \
-  'dnf -y install iwl6000g2a-firmware iwl7260-firmware'
-
-# Optional packages you might want to install in the sys-template:
-qvm-run --auto --user root --pass-io --no-gui $systemplate \
-  'dnf -y install nano less pciutils xclip git unzip wget'
-
-# Nice(r) Gnome-Terminal compared to xterm
-qvm-run --auto --user root --pass-io --no-gui $systemplate \
-  'dnf -y install gnome-terminal terminus-fonts dejavu-sans-fonts \
-   dejavu-sans-mono-fonts'
-
-#========
-
-# Update template
-qvm-run --auto --user root --pass-io --no-gui $template   'dnf update -y'
-
-#clone template
-qvm-clone $template $systemplate
-
-# Install apps gor Network VM            
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'dnf -y install NetworkManager NetworkManager-wifi network-manager-applet \
   wireless-tools dbus-x11 tar tinyproxy iptables usbutils \
@@ -49,7 +30,15 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
   qubes-core-agent-dom0-updates qubes-core-agent-network-manager \
   notification-daemon gnome-keyring polkit @hardware-support \
   tcpdump telnet nmap nmap-ncat qubes-usb-proxy qubes-input-proxy-sender \
-  iwl6000g2a-firmware iwl7260-firmware qubes-menus qubes-gpg-split'
+  iwl6000g2a-firmware iwl7260-firmware qubes-menus qubes-gpg-split 
+  xclip git unzip wget'
+  
+  
+# Nice(r) Gnome-Terminal compared to xterm
+qvm-run --auto --user root --pass-io --no-gui $systemplate \
+  'dnf -y install gnome-terminal terminus-fonts dejavu-sans-fonts \
+   dejavu-sans-mono-fonts'
+
 
 # Set new template as template for sys-vms
 qvm-shutdown --all --wait --timeout 120
@@ -57,7 +46,4 @@ qvm-prefs --set sys-usb template $systemplate
 qvm-prefs --set sys-net template $systemplate
 qvm-prefs --set sys-firewall template $systemplate
 #qvm-prefs --set sys-vpn template $systemplate
-
-
-
 ```
