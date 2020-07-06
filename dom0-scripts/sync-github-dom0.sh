@@ -3,7 +3,7 @@
 # Purpose: Copies a github-repository to dom0 and vica versa
 # Usage  : copy-github-dom0 - options are set in this script
 # Author : one7two99@gmail.com
-# Date   : 29.06.20
+# Date   : 06.07.20
  
 AppVM=my-untrusted
 GithubAccount=one7two99
