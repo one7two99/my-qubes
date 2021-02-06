@@ -6,7 +6,6 @@ Template=fedora-32-minimal
 TemplateName=t-fedora-32-apps
 qvm-kill $TemplateName
 qvm-remove --force $TemplateName
-qvm-start --skip-if-running sys-firewall
 qvm-clone $Template $TemplateName
 qvm-run --auto --pass-io --no-gui --user root $TemplateName \
   'dnf -y update'
