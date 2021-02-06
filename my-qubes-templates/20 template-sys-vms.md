@@ -30,7 +30,7 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
   qubes-core-agent-dom0-updates qubes-core-agent-network-manager \
   notification-daemon gnome-keyring polkit @hardware-support \
   tcpdump telnet nmap nmap-ncat qubes-usb-proxy qubes-input-proxy-sender \
-  iwl6000g2a-firmware iwl7260-firmware qubes-menus qubes-gpg-split 
+  iwl6000g2a-firmware iwl7260-firmware qubes-menus qubes-gpg-split \
   xclip git unzip wget'
   
   
