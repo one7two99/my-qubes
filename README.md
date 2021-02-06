@@ -1,5 +1,4 @@
 # my-qubes
-Last Upload: 2021/feb/06
 
  - \docs - contains howtos
  - \dom0-scripts - Scripts for dom0
