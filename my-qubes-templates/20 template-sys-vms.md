@@ -1,8 +1,8 @@
- t-fedora-32-sys -> ok
-=================
+ t-fedora-33
+============
 ```
-template=fedora-32-minimal
-systemplate=t-fedora-32-sys
+template=fedora-33-minimal
+systemplate=t-fedora-33-sys
 
 #remove old template
 qvm-kill $systemplate
