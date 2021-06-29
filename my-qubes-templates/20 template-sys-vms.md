@@ -31,11 +31,20 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
   pciutils nano less psmisc qubes-core-agent-networking iproute \
   qubes-core-agent-dom0-updates qubes-core-agent-network-manager \
   notification-daemon gnome-keyring polkit @hardware-support \
-  tcpdump telnet nmap nmap-ncat qubes-usb-proxy qubes-input-proxy-sender \
-  iwl6000g2a-firmware iwl7260-firmware qubes-menus qubes-gpg-split \
-  xclip git unzip wget'
-  
-  
+  qubes-usb-proxy qubes-input-proxy-sender \
+  qubes-menus qubes-gpg-split git unzip wget'
+
+# More tools
+qvm-run --auto --user root --pass-io --no-gui $systemplate \
+  'dnf -y install tcpdump telnet nmap nmap-ncat xclip'
+
+# Wifi drivers
+# https://www.intel.de/content/www/de/de/support/articles/000005511/network-and-i-o/wireless-networking.html
+#    W540 = iwl7260 (iwl7260-firmware)
+#    X230 = iwl6000g2a (iwl6000g2a-firmware)
+qvm-run --auto --user root --pass-io --no-gui $systemplate \
+  'dnf -y install iwl6000g2a-firmware iwl7260-firmware'
+    
 # Nice(r) Gnome-Terminal compared to xterm
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'dnf -y install gnome-terminal terminus-fonts dejavu-sans-fonts \
