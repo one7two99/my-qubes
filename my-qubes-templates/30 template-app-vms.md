@@ -2,8 +2,8 @@
  t-fedora-32-apps -> ok
 ==================
 
-Template=fedora-32-minimal
-TemplateName=t-fedora-32-apps
+Template=fedora-33-minimal
+TemplateName=t-fedora-33-apps
 qvm-kill $TemplateName
 qvm-remove --force $TemplateName
 qvm-clone $Template $TemplateName
@@ -11,13 +11,17 @@ qvm-run --auto --pass-io --no-gui --user root $TemplateName \
   'dnf -y update'
 
 qvm-run --auto --pass-io --no-gui --user root $TemplateName \
-  'dnf install -y emacs keepass klavaro libreoffice gedit gimp \
-  firefox qubes-usb-proxy pulseaudio-qubes nano git transmission mc \
-  transmission-cli less qubes-gpg-split qubes-core-agent-networking unzip \
-  nautilus wget qubes-core-agent-nautilus gnome-terminal-nautilus evince \
-  polkit e2fsprogs gnome-terminal terminus-fonts dejavu-sans-fonts \
-  dejavu-sans-mono-fonts xclip pinentry-gtk \
+  'dnf install -y keepass klavaro libreoffice gedit gimp \
+  firefox qubes-usb-proxy pulseaudio-qubes nano git mc evince \
+  less qubes-gpg-split qubes-core-agent-networking unzip \
+  nautilus wget qubes-core-agent-nautilus evince pinentry-gtk \
   evince-nautilus nautilus-sendto nautilus-search-tool'
+
+# more apps
+qvm-run --auto --pass-io --no-gui --user root $TemplateName \
+  'dnf install -y emacs transmission transmission-cli \
+  gnome-terminal-nautilus polkit e2fsprogs gnome-terminal \
+  terminus-fonts dejavu-sans-fonts dejavu-sans-mono-fonts xclip'
 
 qvm-shutdown --wait $TemplateName
 

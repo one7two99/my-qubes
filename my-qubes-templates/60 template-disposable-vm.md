@@ -3,7 +3,7 @@
 ===============
 
 # Create a new Disposable App-VM which is based on a custom template t-fedora-2
-template4dvm=t-fedora-29-apps
+template4dvm=t-fedora-33-apps
 newdvmtemplatename=my-dvm
 qvm-create --template $template4dvm --label red --property template_for_dispvms=True --class=AppVM $newdvmtemplatename
  

@@ -2,7 +2,7 @@
  Vault-VM -> ok
 ==========
 
-template=t-fedora-30-apps
+template=t-fedora-33-apps
 appvm=my-vault
 
 qvm-shutdown --wait $appvm
