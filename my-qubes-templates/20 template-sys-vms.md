@@ -2,6 +2,8 @@ t-fedora-33
 ============
 2021/06/29
 
+Howto setup a sys-template based on fedora minimal
+
 ```
 template=fedora-33-minimal
 systemplate=t-fedora-33-sys
