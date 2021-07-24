@@ -1,3 +1,69 @@
+VPN ProxyVM with ExpressVPN
+===========================
+sys_template=t-fedora-33-sys
+dvm_sys_template=t-fedora-33-sys-dvm
+appvm=sys-vpn-dvm
+netvm=sys-net-dvm
+fwvm=sys-fw-dvm
+
+Note:
+See setup of sys-vms to build the t-fedora-33-sys & t-fedora-33-sys-dvm-template
+
+# 1) install VPN script in templatevm
+qvm-prefs $sys_template netvm $netvm
+qvm-run --auto --pass-io --no-gui --user root $sys_template  \
+   'mkdir -p /rw/config/vpn && \
+    cd /root && \
+    git clone https://github.com/tasket/Qubes-vpn-support.git && \
+    cd Qubes-vpn-support && \
+    bash ./install'
+qvm-prefs $sys_template netvm ''
+qvm-shutdown --wait $sys_template
+
+# 2) configure disposable vm template
+
+#set bind dirs in DVM template
+qvm-run --auto --pass-io --user root $dvm_sys_template 'xterm -e \
+  "mkdir -p /rw/config/qubes-bind-dirs.d && \
+   mkdir -p /rw/config/vpn"'
+qvm-run --auto --pass-io --user root $dvm_sys_template 'xterm -e "nano /rw/config/qubes-bind-dirs.d/50_user.conf"'
+# add: binds+=( '/usr/lib/qubes' )
+# add: binds+=( '/rw/config/vpn' )
+qvm-shutdown --wait $dvm_sys_template
+
+# edit the qubes-vpn-setup script and disable check of proxy VM in the config section (disable IF check)
+qvm-run --auto --pass-io --user root $dvm_sys_template 'xterm -e "nano /usr/lib/qubes/qubes-vpn-setup"'
+
+# download OpenVPN config for ExpressVPN to /rw/config/vpn
+# link the config file for use with qubes-vpn-script
+qvm-run --auto --pass-io --user root $dvm_sys_template \
+   'cd /rw/config/vpn && ln -s my_expressvpn* vpn-client.conf'
+
+# run config script and add your credentials
+qvm-run --auto --pass-io --user root $dvm_sys_template 'xterm -e "/usr/lib/qubes/qubes-vpn-setup --config"'
+qvm-shutdown --wait $dvm_sys_template
+
+# Create Disposable sys-vpn-dvm
+qvm-create -C DispVM -l orange --template $dvm_sys_template $appvm
+qvm-prefs $appvm memory 400
+qvm-prefs $appvm maxmem 1024
+qvm-prefs $appvm vcpus 1
+qvm-prefs $appvm netvm $netvm
+qvm-features $appvm appmenus-dispvm ''
+qvm-prefs $appvm provides_network true
+qvm-service $appvm vpn-handler-openvpn on
+
+# Starting up the disposable sys-vpn-dvm should establish a tunnel
+qvm-start $appvm
+
+# Use the sys-vpn-dvm as net-vm for sys-firewall
+qvm-prefs $fwvm netvm $appvm
+
+
+
+###### old stuff ##########
+
+
 How to use a ProxyVM to run all traffix through PIA
 ===================================================
 
@@ -14,9 +80,9 @@ Links:
 ```
 # A ProxyVM based on my custom fedora-30-minimal sys-template
 
-Template=t-fedora-30-sys
+Template=t-fedora-33-sys
 AppVM=sys-vpn
-FirewallVM=sys-mirage-fw
+#FirewallVM=sys-mirage-fw
 
 # Remove an existing AppVM   
 if [ -d /var/lib/qubes/appvms/$AppVM ];
@@ -41,7 +107,7 @@ qvm-run --auto --pass-io --no-gui --user root $AppVM \
    # Link to your favorite VPN-Entry Point here: && \
    ln -s Switzerland.ovpn vpn-client.conf'
 
-# Add "vpn-handler-openvpn" to the Settings > Services Tab
+# Add "vpn-handler-openvpn" to the Settinvpn-handler-opgs > Services Tab
 qvm-service $AppVM vpn-handler-openvpn on
 
 qvm-shutdown --wait $AppVM
@@ -111,3 +177,5 @@ Content of /rw/config/secrets/password.txt'
 ```
 <YOUR-PASSWORD>
 ```
+
+
