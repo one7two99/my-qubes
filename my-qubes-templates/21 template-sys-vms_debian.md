@@ -22,7 +22,7 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
 # debian
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'apt-get install \
-	pciutils usbutils less psmisc nano unzip wget \
+	pciutils usbutils less psmisc nano unzip wget git libnotify-bin \
 	qubes-core-agent-networking qubes-core-agent-dom0-updates \
 	qubes-usb-proxy qubes-input-proxy-sender \
 	qubes-menus qubes-gpg-split qubes-mgmt-salt-vm-connector zenity \

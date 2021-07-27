@@ -9,6 +9,17 @@ fwvm=sys-fw-dvm
 Note:
 See setup of sys-vms to build the t-fedora-33-sys & t-fedora-33-sys-dvm-template
 
+# 0) Create a DispVM
+sys_template=t-debian-10-sys
+dvm_sys_template=t-debian-10-sys-dvm
+
+# create a disposable template for the sys-vms
+qvm-create --template $sys_template --label red $dvm_sys_template
+qvm-prefs $dvm_sys_template template_for_dispvms True
+qvm-prefs $dvm_sys_template netvm ''
+qvm-features $dvm_sys_template appmenus-dispvm 1
+
+
 # 1) install VPN script in templatevm
 qvm-prefs $sys_template netvm $netvm
 qvm-run --auto --pass-io --no-gui --user root $sys_template  \
@@ -22,6 +33,8 @@ qvm-shutdown --wait $sys_template
 
 # 2) configure disposable vm template
 
+dvm_sys_template=t-debian-10-dvm
+
 #set bind dirs in DVM template
 qvm-run --auto --pass-io --user root $dvm_sys_template 'xterm -e \
   "mkdir -p /rw/config/qubes-bind-dirs.d && \
@@ -33,15 +46,46 @@ qvm-shutdown --wait $dvm_sys_template
 
 # edit the qubes-vpn-setup script and disable check of proxy VM in the config section (disable IF check)
 qvm-run --auto --pass-io --user root $dvm_sys_template 'xterm -e "nano /usr/lib/qubes/qubes-vpn-setup"'
+####### comment out the following sections #######
+--config)
+    . /usr/lib/qubes/init/functions
+#    if is_proxyvm ; then
+        mkdir -p /rw/config/vpn
+        firewall_link /usr/lib/qubes
+        do_userpass
+        echo "Done!"
+#    else
+#        echo "Error: Not a proxyVM. Check instructions."
+#    fi
+;;
 
-# download OpenVPN config for ExpressVPN to /rw/config/vpn
+--config-nm)
+    . /usr/lib/qubes/init/functions
+#    if is_proxyvm ; then
+        firewall_link /usr/lib/qubes
+        echo "Done!"
+#    else
+#        echo "Error: Not a proxyVM. Please check instructions."
+#        exit 1
+#    fi
+;;
+
+
+
+# download OpenVPN config for ExpressVPN and copy & paste it to /rw/config/vpn
+# paste the content of the .ovpn-file here:
+qvm-run --auto --pass-io --user root $dvm_sys_template 'xterm -e "nano /rw/config/vpn/expressvpn_frankfurt.ovpn"'
+
 # link the config file for use with qubes-vpn-script
-qvm-run --auto --pass-io --user root $dvm_sys_template \
-   'cd /rw/config/vpn && ln -s my_expressvpn* vpn-client.conf'
+vm-run --auto --pass-io --user root $dvm_sys_template \
+	'cd /rw/config/vpn && ln -s expressvpn* vpn-client.conf'
 
 # run config script and add your credentials
 qvm-run --auto --pass-io --user root $dvm_sys_template 'xterm -e "/usr/lib/qubes/qubes-vpn-setup --config"'
+# check credentials
+qvm-run --auto --pass-io --user root --pass-io $dvm_sys_template 'cat /rw/config/vpn/userpassword.txt'
 qvm-shutdown --wait $dvm_sys_template
+
 
 # Create Disposable sys-vpn-dvm
 qvm-create -C DispVM -l orange --template $dvm_sys_template $appvm
