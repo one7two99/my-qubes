@@ -7,6 +7,10 @@ Template=debian-10-minimal
 TemplateName=t-debian-10-media
 AppVMName=my-media
 qvm-clone $Template $TemplateName
+
+# Download Chrome from another AppVM and move it to the Template-VM
+# wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+
 qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt-get update && apt-get -y upgrade && apt autoremove'
 qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt-install /home/user/QubesIncoming/*/google-chrome-stable_current_amd64.deb'
 qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt-get update && apt-get -y upgrade && apt autoremove'
