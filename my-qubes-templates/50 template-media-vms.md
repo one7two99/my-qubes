@@ -1,6 +1,21 @@
- t-fedora-32-media -> ok
-===================
+t-fedora-32-media
+=================
+## Debian based
+See also: https://linuxize.com/post/how-to-install-google-chrome-web-browser-on-debian-10/
+```
+Template=debian-10-minimal
+TemplateName=t-debian-10-media
+AppVMName=my-media
+qvm-clone $Template $TemplateName
+qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt-get update && apt-get -y upgrade && apt autoremove'
+qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt-install /home/user/QubesIncoming/*/google-chrome-stable_current_amd64.deb'
+qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt-get update && apt-get -y upgrade && apt autoremove'
+qvm-run --auto --pass-io --no-gui --user root $TemplateName 'rm /home/user/QubesIncoming/*/google-chrome-stable_current_amd64.deb'
+qvm-shutdown --wait $TemplateName 
+qvm-create --template=$TemplateName --label=orange $AppVMName
+```
 
+## Fedora based
 ```
 Template=fedora-32-minimal
 TemplateName=t-fedora-32-media
@@ -25,3 +40,4 @@ qvm-shutdown --wait $TemplateName
 qvm-create --template=$TemplateName --label=orange $AppVMName
 ```
 
+y
