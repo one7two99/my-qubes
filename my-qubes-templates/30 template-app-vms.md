@@ -2,7 +2,7 @@
 =======================================
 
 
-# fedora
+## fedora
 ```
 Template=fedora-33-minimal
 TemplateName=t-fedora-33-apps
@@ -21,7 +21,7 @@ qvm-run --auto --pass-io --no-gui --user root $TemplateName \
   evince-nautilus nautilus-sendto nautilus-search-tool borgbackup'
 ```
 
-# debian
+## debian
 ```
 Template=debian-10-minimal
 TemplateName=t-debian-10-apps
@@ -39,7 +39,7 @@ qvm-run --auto --pass-io --no-gui --user root $TemplateName \
   nautilus wget qubes-core-agent-nautilus evince pinentry-gtk2 borgbackup'
 ```
 
-# more apps
+## more apps
 ```
 qvm-run --auto --pass-io --no-gui --user root $TemplateName \
   'dnf install -y emacs transmission transmission-cli \
@@ -49,7 +49,7 @@ qvm-run --auto --pass-io --no-gui --user root $TemplateName \
 qvm-shutdown --wait $TemplateName
 ```
 
-# set App-template as defaut template
+## set App-template as defaut template
 ```
 qubes-prefs --set default_template $TemplateName
 ```
