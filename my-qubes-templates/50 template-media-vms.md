@@ -39,5 +39,3 @@ qvm-shutdown --wait $TemplateName
 
 qvm-create --template=$TemplateName --label=orange $AppVMName
 ```
-
-y
