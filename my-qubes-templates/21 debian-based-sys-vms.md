@@ -1,6 +1,6 @@
 t-debian-10-sys
 ===============
-2021/07/24
+2021/11/01
 
 Howto setup a sys template based on Debian 10
 
@@ -42,9 +42,10 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
 ```
 Disposable Sys-VMs
 ==================
-See also:
-https://qubes-os.org/doc/disposable-customization
+See also: https://qubes-os.org/doc/disposable-customization
 
+Prepare disposable AppVM as template for (named) disposable sys-VMs
+-------------------------------------------------------------------
 ```
 sys_template=t-debian-10-sys
 dvm_sys_template=t-debian-10-sys-dvm
