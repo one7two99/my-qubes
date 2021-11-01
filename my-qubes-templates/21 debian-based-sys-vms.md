@@ -144,3 +144,4 @@ nano /etc/qubes-rpc/policy/qubes.InputKeyboard
 sys-usb-dvm dom0 allow,user=root
 $anyvm $anyvm deny
 ```
+ 
