@@ -1,6 +1,6 @@
-t-fedora-33
-============
-2021/06/29
+Fedora based sys-vms
+====================
+Last change: 2021/11/01
 
 Howto setup a sys-template based on fedora minimal
 
@@ -19,12 +19,7 @@ qvm-clone $template $systemplate
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'dnf update -y'
 
-# packages for sys-VMs inluding some tools
-# See Wifi Drivers:
-# https://www.intel.de/content/www/de/de/support/articles/000005511/network-and-i-o/wireless-networking.html
-#    W540 = iwl7260 (iwl7260-firmware)
-#    X230 = iwl6000g2a (iwl6000g2a-firmware)
-# fedora
+# Install packages for sys-VMs
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'dnf -y install NetworkManager NetworkManager-wifi network-manager-applet \
   wireless-tools dbus-x11 tar tinyproxy iptables usbutils \
@@ -37,12 +32,21 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
   qubes-usb-proxy qubes-input-proxy-sender iputils \
   qubes-menus qubes-gpg-split git unzip wget'
 
-# debian
+# See Wifi Drivers:
+# https://www.intel.de/content/www/de/de/support/articles/000005511/network-and-i-o/wireless-networking.html
+#    W540/X270 = iwl7260 (iwl7260-firmware)
+#    X230 = iwl6000g2a (iwl6000g2a-firmware)
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
-  'apt-get install 
+  'dnf -y install iwl6000g2a-firmware iwl7260-firmware'
 
+```
+Debian based sys-vms
+====================
 
-NetworkManager NetworkManager-wifi network-manager-applet \
+```
+# Install packages
+qvm-run --auto --user root --pass-io --no-gui $systemplate \
+  'apt-get install NetworkManager NetworkManager-wifi network-manager-applet \
   wireless-tools dbus-x11 tar tinyproxy iptables usbutils \
   NetworkManager-openconnect NetworkManager-openconnect-gnome \
   NetworkManager-openvpn NetworkManager-openvpn-gnome \
@@ -53,10 +57,9 @@ NetworkManager NetworkManager-wifi network-manager-applet \
   qubes-usb-proxy qubes-input-proxy-sender iputils \
   qubes-menus qubes-gpg-split git unzip wget'
 
-
-# More tools
+# Optional: install a few more tools
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
-  'dnf -y install tcpdump telnet nmap nmap-ncat xclip'
+  'dnf -y install tcpdump telnet nmap nmap-ncat'
 
 # Wifi drivers
 # https://www.intel.de/content/www/de/de/support/articles/000005511/network-and-i-o/wireless-networking.html
@@ -70,12 +73,14 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'dnf -y install gnome-terminal terminus-fonts dejavu-sans-fonts \
    dejavu-sans-mono-fonts'
+```
 
 Disposable Sys-VMs
 ==================
 See also:
 https://qubes-os.org/doc/disposable-customization
 
+```
 sys_template=t-fedora-33-sys
 dvm_sys_template=t-fedora-33-sys-dvm
 
@@ -164,6 +169,4 @@ qvm-pci attach --persistent -o no-strict-reset=True $appvm dom0:02_00.0
 qvm-pci attach --persistent -o no-strict-reset=True $appvm dom0:00_19.0 
 
 # change clock vm to the new net-VM in "System Tools" > "Qubes Global Settings"
-
-
 ```
