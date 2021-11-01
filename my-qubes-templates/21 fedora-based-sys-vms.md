@@ -1,5 +1,5 @@
-Fedora based sys-vms (including disposables)
-============================================
+Fedora based minimal sys-vms (including disposables)
+====================================================
 Last change: 2021/11/01
 
 Howto setup a sys-template based on fedora minimal
