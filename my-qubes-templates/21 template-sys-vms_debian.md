@@ -1,5 +1,5 @@
 t-debian-10-sys
-============
+===============
 2021/07/24
 
 Howto setup a sys template based on Debian 10
@@ -35,36 +35,11 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'dnf -y install tcpdump telnet nmap nmap-ncat'
 
-
-######old
-
-# packages for sys-VMs inluding some tools
-# See Wifi Drivers:
-# https://www.intel.de/content/www/de/de/support/articles/000005511/network-and-i-o/wireless-networking.html
-#    W540 = iwl7260 (iwl7260-firmware)
-#    X230 = iwl6000g2a (iwl6000g2a-firmware)
-
-
-
 ####
-dbus-x11 tar tinyproxy iptables gnome-keyring \
-iproute git iputils notification-daemon gnome-keyring polkit @hardware-support'
+#dbus-x11 tar tinyproxy iptables gnome-keyring \
+#iproute git iputils notification-daemon gnome-keyring polkit @hardware-support'
 
-
-# Wifi drivers
-# https://www.intel.de/content/www/de/de/support/articles/000005511/network-and-i-o/wireless-networking.html
-#    W540 = iwl7260 (iwl7260-firmware)
-#    X230 = iwl6000g2a (iwl6000g2a-firmware)
-qvm-run --auto --user root --pass-io --no-gui $systemplate \
-  'dnf -y install iwl6000g2a-firmware iwl7260-firmware'
-    
-
-# Nice(r) Gnome-Terminal compared to xterm
-qvm-run --auto --user root --pass-io --no-gui $systemplate \
-  'dnf -y install gnome-terminal terminus-fonts dejavu-sans-fonts \
-   dejavu-sans-mono-fonts'
 ```
-
 Disposable Sys-VMs
 ==================
 See also:
@@ -79,10 +54,10 @@ qvm-create --template $sys_template --label red $dvm_sys_template
 qvm-prefs $dvm_sys_template template_for_dispvms True
 qvm-prefs $dvm_sys_template netvm ''
 qvm-features $dvm_sys_template appmenus-dispvm 1
-
-
-
-#### disposable sys-net ####
+```
+Disposable sys-net
+------------------
+```
 dvm_sys_template=t-debian-10-sys-dvm
 netvm=sys-net-dvm
 
@@ -111,10 +86,10 @@ qvm-pci attach --persistent -o no-strict-reset=True $netvm dom0:00_19.0
 
 # Set new netvm as Update Proxy in dom0
 nano /etc/qubes-rpc/policy/qubes.UpdatesProxy
-
-
-
-#### disposable sys-fw ####
+```
+Disposable sys-firewall
+-----------------------
+```
 dvm_sys_template=t-debian-10-sys-dvm
 fwvm=sys-fw-dvm
 netvm=sys-net
@@ -133,10 +108,10 @@ qvm-prefs sys-firewall autostart false
 # switch the netvm of all AppVms/templates from sys-fw to the new sys-fw
 # Remove old sys-firewall
 qvm-remove -f sys-firewall
-
-
-
-#### disposable sys-usb ####
+```
+Disposable sys-usb
+------------------
+```
 dvm_sys_template=t-debian-10-sys-dvm
 usbvm=sys-usb-dvm
 
@@ -163,9 +138,8 @@ qvm-pci attach --persistent $usbvm -o no-strict-reset=True dom0:00_1d.0
 # if the name of the usb-qube has changed you must add in dom0
 # Link: https://www.qubes-os.org/doc/usb-qubes/
 nano /etc/qubes-rpc/policy/qubes.InputMouse 
+nano /etc/qubes-rpc/policy/qubes.InputKeyboard 
 # content of file:
 sys-usb-dvm dom0 allow,user=root
 $anyvm $anyvm deny
-
-
 ```
