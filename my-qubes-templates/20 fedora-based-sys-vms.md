@@ -1,5 +1,5 @@
-Fedora based sys-vms
-====================
+Fedora based sys-vms (including disposables)
+============================================
 Last change: 2021/11/01
 
 Howto setup a sys-template based on fedora minimal
@@ -43,9 +43,10 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
 
 Disposable Sys-VMs
 ==================
-See also:
-https://qubes-os.org/doc/disposable-customization
+See also: https://qubes-os.org/doc/disposable-customization
 
+Prepare disposable AppVM as template for (named) disposable sys-VMs
+-------------------------------------------------------------------
 ```
 sys_template=t-fedora-33-sys
 dvm_sys_template=t-fedora-33-sys-dvm
@@ -55,8 +56,38 @@ qvm-create --template $sys_template --label red $dvm_sys_template
 qvm-prefs $dvm_sys_template template_for_dispvms True
 qvm-prefs $dvm_sys_template netvm ''
 qvm-features $dvm_sys_template appmenus-dispvm 1
+```
+Disposable sys-net
+------------------
+```
+#### disposable sys-net ####
+dvm_sys_template=t-fedora-33-sys-dvm
+appvm=sys-net-dvm
 
-#### disposable sys-fw ####
+qvm-create -C DispVM -l red --template $dvm_sys_template $appvm
+qvm-prefs $appvm virt_mode hvm
+# qvm-prefs $appvm meminfo-writer off
+qvm-prefs $appvm memory 400
+qvm-prefs $appvm maxmem 0
+qvm-prefs $appvm vcpus 1
+qvm-prefs $appvm netvm ''
+qvm-prefs $appvm autostart True
+qvm-prefs $appvm provides_network true
+qvm-features $appvm appmenus-dispvm ''
+
+# to find out PCI devices
+qvm-pci | grep Network && qvm-pci | grep Ethernet
+
+# add Network controllers to sys-net-dvm
+# maybe you need to add: -o no-strict-reset=True
+qvm-pci attach --persistent -o no-strict-reset=True $appvm dom0:02_00.0 
+qvm-pci attach --persistent -o no-strict-reset=True $appvm dom0:00_19.0 
+
+# change clock vm to the new net-VM in "System Tools" > "Qubes Global Settings"
+```
+Disposable sys-firewall
+-----------------------
+```
 dvm_sys_template=t-fedora-33-sys-dvm
 appvm=sys-fw-dvm
 netvm=sys-net-dvm
@@ -77,9 +108,10 @@ qvm-remove -f sys-firewall
 
 # set new firewall VM for dom0-updates in "System Tools" > "Qubes Global Settings"
 # nano /etc/qubes-rpc/policy/qubes.UpdatesProxy
-
-
-#### disposable sys-usb ####
+```
+Disposable sys-usb
+------------------
+```
 dvm_sys_template=t-fedora-33-sys-dvm
 appvm=sys-usb-dvm
 
@@ -106,33 +138,8 @@ qvm-pci attach --persistent $appvm -o no-strict-reset=True dom0:00_1d.0
 # if the name of the usb-qube has changed you must add in dom0
 # Link: https://www.qubes-os.org/doc/usb-qubes/
 nano /etc/qubes-rpc/policy/qubes.InputMouse 
+nano /etc/qubes-rpc/policy/qubes.InputKeyboard
 # content of file:
 sys-usb-dvm dom0 allow,user=root
 $anyvm $anyvm deny
-
-
-#### disposable sys-net ####
-dvm_sys_template=t-fedora-33-sys-dvm
-appvm=sys-net-dvm
-
-qvm-create -C DispVM -l red --template $dvm_sys_template $appvm
-qvm-prefs $appvm virt_mode hvm
-# qvm-prefs $appvm meminfo-writer off
-qvm-prefs $appvm memory 400
-qvm-prefs $appvm maxmem 0
-qvm-prefs $appvm vcpus 1
-qvm-prefs $appvm netvm ''
-qvm-prefs $appvm autostart True
-qvm-prefs $appvm provides_network true
-qvm-features $appvm appmenus-dispvm ''
-
-# to find out PCI devices
-qvm-pci | grep Network && qvm-pci | grep Ethernet
-
-# add Network controllers to sys-net-dvm
-# maybe you need to add: -o no-strict-reset=True
-qvm-pci attach --persistent -o no-strict-reset=True $appvm dom0:02_00.0 
-qvm-pci attach --persistent -o no-strict-reset=True $appvm dom0:00_19.0 
-
-# change clock vm to the new net-VM in "System Tools" > "Qubes Global Settings"
 ```
