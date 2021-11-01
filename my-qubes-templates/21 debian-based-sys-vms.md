@@ -1,5 +1,5 @@
-t-debian-10-sys
-===============
+Debian based minimal sys-vms (including disposable sys-vms)
+===========================================================
 2021/11/01
 
 Howto setup a sys template based on Debian 10
