@@ -11,7 +11,7 @@ qvm-template --enablerepo qubes-templates-itl-testing install debian-11-minimal
 # clone into a new template
 qvm-clone debian-11-minimal $TemplateVM
 
-qvm-run --pass-io --no-gui --user=root $TemplateVM 'apt-get update && apt-get dist-upgrade'
+qvm-run --pass-io --no-gui --user=root $TemplateVM 'apt-get -y update && apt-get dist-upgrade'
 qvm-run --pass-io --no-gui --user=root $TemplateVM 'apt-get -y install zenity pulseaudio-qubes qubes-menus qubes-core-agent-networking qubes-mgmt-salt-vm-connector'
 qvm-run --pass-io --no-gui --user=root $TemplateVM 'apt-get -y install --no-install-recommends sudo adduser'
 qvm-run --pass-io --no-gui --user=root $TemplateVM 'addgroup -system console && adduser user console && adduser user sudo'
