@@ -1,9 +1,43 @@
-How to setup a sys-dns using NextDNS.io
-=======================================
+How to NextDNS.io under Qubes OS 4.1 (sys-dns NetVM Qube)
+=========================================================
 sys-dns is a NetVM which can be setup between sys-net and an AppVM and will work as DNS server for the connected AppVms.
 The DNS SysVM will use stubby as local DNS server and is using DNS-over-TLS using NextDNS.io nameservers (https://nextdns.io).
 
 It will work in both scenarios:
+```
+template=debian-10-minimal
+systemplate=t-debian-10-sys
+
+#remove old template
+qvm-kill $systemplate
+qvm-remove -f $systemplate
+
+#clone template
+qvm-clone $template $systemplate
+
+# update template
+qvm-run --auto --user root --pass-io --no-gui $systemplate \
+  'apt-get update && apt-get -y upgrade && apt autoremove'
+
+# debian
+qvm-run --auto --user root --pass-io --no-gui $systemplate \
+  'apt-get install \
+        pciutils usbutils less psmisc nano unzip wget git libnotify-bin \
+        qubes-core-agent-networking qubes-core-agent-dom0-updates \
+        qubes-usb-proxy qubes-input-proxy-sender \
+        qubes-menus qubes-gpg-split qubes-mgmt-salt-vm-connector zenity \
+        network-manager network-manager-openconnect network-manager-openconnect-gnome \
+        network-manager-openvpn network-manager-openvpn-gnome \
+        qubes-core-agent-network-manager \
+        wireless-tools usb-modeswitch modem-manager-gui firmware-iwlwifi'
+
+# More tools
+qvm-run --auto --user root --pass-io --no-gui $systemplate \
+  'apt-get install dnsutils iputils'
+
+qvm-run --auto --user root --pass-io --no-gui $systemplate \
+  'apt-get install tcpdump telnet nmap ncat git'
+
 
 - sys-net <- sys-dns <- sys-firewall <- AppVM(s)
 - sys-net <- sys-firewall <- sys-dns <- AppVM(s)
