@@ -1,4 +1,14 @@
 ```
+# This howto will describe how you can setup a pihole NetVM which will 
+# use NextDNS DNS-over-TLS as upstream DNS servers.
+# It will allow you to filter out most dns spam locally (within Pihole) 
+# and use NextDNS cloud services as an additional layer of protection.
+# analyzing NextDNS logs you can also see at which point you can improve
+# your pihole block lists.
+
+# All commands can be run from dom0
+
+# some variables to keep the setup flexible - change the names here
 PiholeVM=sys-pidns2
 TemplateVM=debian-10-minimal
 
