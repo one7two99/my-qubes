@@ -26,6 +26,7 @@ qvm-shutdown $TemplateVM
 ### create new standalone qube
 qvm-create --template $TemplateVM --class StandaloneVM --label red $PiholeVM
 qvm-prefs $PiholeVM provides_network true
+qvm-service $PiholeVM qubes-firewall on
 
 ### tools
 qvm-run --auto --user root --pass-io --no-gui $PiholeVM 'apt-get install \
