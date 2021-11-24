@@ -25,13 +25,6 @@ qvm-run --auto --user root --pass-io --no-gui $PiholeVM 'git clone --depth 1 htt
 qvm-run --auto --user root $PiholeVM "xterm -e 'cd Pi-hole && cd automated\ install && bash basic-install.sh && read'"
 # >>> write down login credentials!! <<<
 
-# IP = 10.137.0.20 // 17
-# GUI = 10.137.0.20/admin
-# Passwort = CtpaVu8a // 2228_wSh
-####
-# IP		http://10.137.0.33/admin
-# Password	tI3MwsVl 
-
 ### create file which will be run each time a qubes is started
 qvm-run --user=root --pass-io --no-gui $PiholeVM 'mkdir -p /rw/config/network-hooks.d'
 qvm-run --user=root $PiholeVM "xterm -e 'nano /rw/config/network-hooks.d/fw-update.sh'"
@@ -111,11 +104,12 @@ server:
 forward-zone:
   name: "."
   forward-tls-upstream: yes
-# insert DNS setting for unbound from NextDNS.io page
-  forward-addr: 45.90.28.0#ab6f2a.dns1.nextdns.io
-  forward-addr: 2a07:a8c0::#ab6f2a.dns1.nextdns.io
-  forward-addr: 45.90.30.0#ab6f2a.dns2.nextdns.io
-  forward-addr: 2a07:a8c1::#ab6f2a.dns2.nextdns.io
+  # insert DNS settings for unbound from NextDNS.io page
+  # Login at NextDNS and then scroll down on the Setup-page
+  forward-addr: 45.90.28.0#<YOURNEXTDNSCONFIGID>.dns1.nextdns.io
+  forward-addr: 2a07:a8c0::#<YOURNEXTDNSCONFIGID>.dns1.nextdns.io
+  forward-addr: 45.90.30.0#<YOURNEXTDNSCONFIGID>.dns2.nextdns.io
+  forward-addr: 2a07:a8c1::#<YOURNEXTDNSCONFIGID>.dns2.nextdns.io
 ----------[ end ]-------------
 
 
