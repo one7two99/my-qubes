@@ -6,7 +6,12 @@
 # analyzing NextDNS logs you can also see at which point you can improve
 # your pihole block lists.
 
-# All commands can be run from dom0
+# All commands can be run from dom0.
+# Download the script in an AppV:
+#    cd ~/
+#    wget https://raw.githubusercontent.com/one7two99/my-qubes/master/my-qubes-templates/26-sys-pihole.md
+# then from dom0:
+qvm-run --pass-io --no-gui YOURAPPVM 'cat ~/26-sys-pihole.md' > sys-pihole.txt
 
 # some variables to keep the setup flexible - change the names here
 PiholeVM=sys-pidns2
