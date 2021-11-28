@@ -1,6 +1,6 @@
 Debian based minimal sys-vms (including disposable)
 ===================================================
-2021/11/01
+2021/11/28
 
 Howto setup a sys template based on Debian 10
 
@@ -22,7 +22,7 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
 # debian
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'apt-get install \
-	pciutils usbutils less psmisc nano unzip wget git libnotify-bin \
+	pciutils usbutils tar less psmisc nano unzip wget git libnotify-bin \
 	qubes-core-agent-networking qubes-core-agent-dom0-updates \
 	qubes-usb-proxy qubes-input-proxy-sender \
 	qubes-menus qubes-gpg-split qubes-mgmt-salt-vm-connector zenity \
@@ -31,13 +31,13 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
 	qubes-core-agent-network-manager \
 	wireless-tools usb-modeswitch modem-manager-gui firmware-iwlwifi'
 
-# More tools
+# More tools - this is optionally
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'dnf -y install tcpdump telnet nmap nmap-ncat'
 
-####
-#dbus-x11 tar tinyproxy iptables gnome-keyring \
-#iproute git iputils notification-daemon gnome-keyring polkit @hardware-support'
+#### just kept for reference (unsure if needed)
+#dbus-x11 tinyproxy iptables gnome-keyring iproute iputils notification-daemon
+# gnome-keyring polkit @hardware-support'
 
 ```
 Disposable Sys-VMs
@@ -69,6 +69,7 @@ qvm-prefs $netvm memory 400
 qvm-prefs $netvm maxmem 0
 qvm-prefs $netvm vcpus 1
 qvm-prefs $netvm netvm ''
+qvm-service $fwvm network-manager on
 qvm-prefs $netvm autostart True
 qvm-prefs $netvm provides_network true
 qvm-features $netvm appmenus-dispvm ''
@@ -82,7 +83,6 @@ qvm-pci attach --persistent -o no-strict-reset=True $netvm dom0:02_00.0
 qvm-pci attach --persistent -o no-strict-reset=True $netvm dom0:00_19.0 
 
 # change clock vm to the new net-VM in "System Tools" > "Qubes Global Settings"
-
 # set new netvm VM for dom0-updates in "System Tools" > "Qubes Global Settings"
 
 # Set new netvm as Update Proxy in dom0
@@ -103,6 +103,7 @@ qvm-prefs $fwvm netvm $netvm
 qvm-prefs $fwvm autostart true
 qvm-prefs $fwvm provides_network true
 qvm-features $fwvm appmenus-dispvm ''
+qvm-service $fwvm network-manager off
 
 # disable old autostart of sys-firewall
 qvm-prefs sys-firewall autostart false
@@ -125,6 +126,7 @@ qvm-prefs $usbvm vcpus 1
 qvm-prefs $usbvm netvm ''
 qvm-prefs $usbvm autostart true
 qvm-prefs $usbvm provides_network false
+qvm-service $fwvm network-manager off
 qvm-features $usbvm appmenus-dispvm ''
 
 # to find out PCI devices
@@ -136,7 +138,8 @@ qvm-pci attach --persistent $usbvm -o no-strict-reset=True dom0:00_14.0
 qvm-pci attach --persistent $usbvm -o no-strict-reset=True dom0:00_1a.0 
 qvm-pci attach --persistent $usbvm -o no-strict-reset=True dom0:00_1d.0 
 
-# if the name of the usb-qube has changed you must add in dom0
+# if the name of the usb-qube has changed you must update the settibgs in dom0
+# In this example, my USB-qube is named sys-usb-dvm
 # Link: https://www.qubes-os.org/doc/usb-qubes/
 nano /etc/qubes-rpc/policy/qubes.InputMouse 
 nano /etc/qubes-rpc/policy/qubes.InputKeyboard 
