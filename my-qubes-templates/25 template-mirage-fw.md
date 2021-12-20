@@ -10,8 +10,8 @@ Problem: the mirage firewall will start, but will halt after a few seconds. Stil
 
 ```
 ### Naming of variables
-TemplateVM=fedora-30
-MirageFWBuildVM=fedora-30-miragebuildvm
+TemplateVM=fedora-34
+MirageFWBuildVM=fedora-34-miragebuildvm
 MirageFWAppVM=sys-mirage-fw
 MyNetVM=sys-firewall
 
