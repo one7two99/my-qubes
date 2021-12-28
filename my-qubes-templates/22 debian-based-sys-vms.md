@@ -24,7 +24,7 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'apt-get install \
 	pciutils usbutils tar less psmisc nano unzip wget git libnotify-bin \
 	qubes-core-agent-networking qubes-core-agent-dom0-updates \
-	qubes-usb-proxy qubes-input-proxy-sender \
+	qubes-usb-proxy qubes-input-proxy-sender notification-daemon \
 	qubes-menus qubes-gpg-split qubes-mgmt-salt-vm-connector zenity \
 	network-manager network-manager-openconnect network-manager-openconnect-gnome \
 	network-manager-openvpn network-manager-openvpn-gnome \
@@ -36,8 +36,8 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'dnf -y install tcpdump telnet nmap nmap-ncat'
 
 #### just kept for reference (unsure if needed)
-#dbus-x11 tinyproxy iptables gnome-keyring iproute iputils notification-daemon
-# gnome-keyring polkit @hardware-support'
+#dbus-x11 tinyproxy iptables gnome-keyring iproute iputils 
+# gnome-keyring polkit @hardware-support xfce4-notifyd'
 
 ```
 Disposable Sys-VMs
