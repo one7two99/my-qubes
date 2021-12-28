@@ -1,5 +1,7 @@
 VPN ProxyVM with ExpressVPN
 ===========================
+
+```
 sys_template=t-fedora-33-sys
 dvm_sys_template=t-fedora-33-sys-dvm
 appvm=sys-vpn-dvm
@@ -18,7 +20,6 @@ qvm-create --template $sys_template --label red $dvm_sys_template
 qvm-prefs $dvm_sys_template template_for_dispvms True
 qvm-prefs $dvm_sys_template netvm ''
 qvm-features $dvm_sys_template appmenus-dispvm 1
-
 
 # 1) install VPN script in templatevm
 qvm-prefs $sys_template netvm $netvm
@@ -102,66 +103,8 @@ qvm-start $appvm
 
 # Use the sys-vpn-dvm as net-vm for sys-firewall
 qvm-prefs $fwvm netvm $appvm
-
-
-
-###### old stuff ##########
-
-
-How to use a ProxyVM to run all traffix through PIA
-===================================================
-
-template=fedora-29-minimal
-# sys-vpn - a Proxy VM to hide your traffic from your ISP
-
-Setup of a VPN-ProxyVM to use Private Internet Access to tunnel all traffic through this VPN provider.
-This script will build the ProxyVM from scratch using my own t-fedora-29-minimal template and the excellent script from "tasket"
-
-Links:
-- https://github.com/tasket/Qubes-vpn-support
-- https://www.qubes-os.org/doc/vpn/
-
 ```
-# A ProxyVM based on my custom fedora-30-minimal sys-template
 
-Template=t-fedora-33-sys
-AppVM=sys-vpn
-#FirewallVM=sys-mirage-fw
-
-# Remove an existing AppVM   
-if [ -d /var/lib/qubes/appvms/$AppVM ];
-   then qvm-kill $AppVM;
-   qvm-remove --force $AppVM;
-fi
-
-qvm-create --template=$Template --label=blue $AppVM
-qvm-prefs --set $AppVM provides_network True 
-
-qvm-run --auto --pass-io --no-gui --user root $AppVM \
-  'mkdir -p /rw/config/vpn && \
-   cd /root && \
-   git clone https://github.com/tasket/Qubes-vpn-support.git && \
-   cd Qubes-vpn-support && \
-   bash ./install'
-
-qvm-run --auto --pass-io --no-gui --user root $AppVM \
-  'cd /rw/config/vpn && \
-   wget https://www.privateinternetaccess.com/openvpn/openvpn-ip.zip && \
-   unzip openvpn-ip.zip && \
-   # Link to your favorite VPN-Entry Point here: && \
-   ln -s Switzerland.ovpn vpn-client.conf'
-
-# Add "vpn-handler-openvpn" to the Settinvpn-handler-opgs > Services Tab
-qvm-service $AppVM vpn-handler-openvpn on
-
-qvm-shutdown --wait $AppVM
-qvm-prefs --set $AppVM netvm sys-net
-qvm-start $AppVM
-
-qvm-prefs --set $FirewallVM netvm $AppVM
-qvm-prefs --get $FirewallVM netvm
-
-```
 
 Connect to a Cisco AnyConnect VPN automatically from CLI using OpenConnect
 ==========================================================================
@@ -183,7 +126,6 @@ iptables -I FORWARD -i eth0 -j DROP
 ip6tables -I FORWARD -o eth0 -j DROP
 ip6tables -I FORWARD -i eth0 -j DROP
 ```
-
 
 Content of /rw/config/rc.local
 
@@ -217,9 +159,8 @@ VPNServerCert=<CERTIFICATE-FINGERPRINT>
 PWDFILE="/rw/config/secrets/password.txt"
 openconnect $VPNHost --protocol=anyconnect --user=$VPNUser --servercert=$VPNServerCert --passwd-on-stdin < $PWDFILE
 ```
-Content of /rw/config/secrets/password.txt'
+
+Content of /rw/config/secrets/password.txt
 ```
 <YOUR-PASSWORD>
 ```
-
-
