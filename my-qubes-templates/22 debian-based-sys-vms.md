@@ -28,7 +28,7 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
 	qubes-menus qubes-gpg-split qubes-mgmt-salt-vm-connector zenity \
 	network-manager network-manager-openconnect network-manager-openconnect-gnome \
 	network-manager-openvpn network-manager-openvpn-gnome \
-	qubes-core-agent-network-manager \
+	qubes-core-agent-network-manager locales locales-all \
 	wireless-tools usb-modeswitch modem-manager-gui firmware-iwlwifi'
 
 # More tools - this is optionally
