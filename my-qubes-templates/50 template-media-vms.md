@@ -1,25 +1,36 @@
-t-fedora-32-media
-=================
-## Debian based
-See also: https://linuxize.com/post/how-to-install-google-chrome-web-browser-on-debian-10/
+Template for a Multimedia AppVM
+===============================
+This template can be used to have an AppVM which has Google Chrome, Open Broadcaster Studio, VideoLAN Client (VLC) and Audacity installed.
+With Google Chrome you can use all streaming services like Amazon Prime, Netflix etc.
+Open Broadcaster and Audicity can be used to create multimedia content for Streamcasting or Podcasts.
+
+## Debian 11 based
 ```
-Template=debian-10-minimal
-TemplateName=t-debian-10-media
+Template=debian-11-minimal
+TemplateName=t_debian-11-media
 AppVMName=my-media
+netvm=sys-net
 qvm-clone $Template $TemplateName
 
 # Download Chrome from another AppVM and move it to the Template-VM
 # wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 
 qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt-get update && apt-get -y upgrade && apt autoremove'
-qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt-install /home/user/QubesIncoming/*/google-chrome-stable_current_amd64.deb'
-qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt-get update && apt-get -y upgrade && apt autoremove'
-qvm-run --auto --pass-io --no-gui --user root $TemplateName 'rm /home/user/QubesIncoming/*/google-chrome-stable_current_amd64.deb'
-qvm-shutdown --wait $TemplateName 
+qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt-get install zenity qubes-core-agent-networking pulseaudio-qubes wget'
+qvm-run --auto --pass-io --no-gui --user root $TemplateName 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list'
+qvm-prefs $TemplateName netvm $netvm
+qvm-run --auto --pass-io --no-gui --user root $TemplateName 'wget -O- https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor > /etc/apt/trusted.gpg.d/google.gpg'
+qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt-get update'
+qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt-get install google-chrome-stable'
+# locale: Cannot set LC_CTYPE to default locale: No such file or directory
+qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt-get install locales locales-all'
+# Open Broadcaster Studio (OBS) & VLC & Audacity
+qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt-get install ffmpeg v4l2loopback-dkms vlc audacity obs-studio locales locales-all'
+qvm-shutdown --wait $TemplateName
 qvm-create --template=$TemplateName --label=orange $AppVMName
 ```
 
-## Fedora based
+## Fedora based (old)
 ```
 Template=fedora-32-minimal
 TemplateName=t-fedora-32-media
