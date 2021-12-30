@@ -2,11 +2,11 @@ Debian based minimal sys-vms (including disposable)
 ===================================================
 2021/11/28
 
-Howto setup a sys template based on Debian 10
+Howto setup a sys template based on Debian 11
 
 ```
-template=debian-10-minimal
-systemplate=t-debian-10-sys
+template=debian-11-minimal
+systemplate=t-debian-11-sys
 
 #remove old template
 qvm-kill $systemplate
@@ -37,7 +37,7 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
 
 #### just kept for reference (unsure if needed)
 #dbus-x11 tinyproxy iptables gnome-keyring iproute iputils 
-# gnome-keyring polkit @hardware-support xfce4-notifyd'
+#polkit @hardware-support xfce4-notifyd'
 
 ```
 Disposable Sys-VMs
