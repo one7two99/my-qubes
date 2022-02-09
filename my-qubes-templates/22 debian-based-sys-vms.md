@@ -1,12 +1,12 @@
 Debian based minimal sys-vms (including disposable)
 ===================================================
-2021/11/28
+2022/02/09
 
 Howto setup a sys template based on Debian 11
 
 ```
 template=debian-11-minimal
-systemplate=t-debian-11-sys
+systemplate=t_debian-11-sys-gnome
 
 #remove old template
 qvm-kill $systemplate
@@ -15,29 +15,71 @@ qvm-remove -f $systemplate
 #clone template
 qvm-clone $template $systemplate
 
+# Conigure locales
+qvm-run --auto --user root --pass-io --no-gui $systemplate 'dpkg-reconfigure locales'
+# install the following locales:  110,111,112,158
+# 110. de_DE ISO-8859-1
+# 111. de_DE.UTF-8 UTF-8
+# 112. de_DE@euro ISO-8859-15 
+# 158. en_US.UTF-8 UTF-8
+# Choose the following default locale: 6. en_US.UTF-8
+
 # update template
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'apt-get update && apt-get -y upgrade && apt autoremove'
 
-# debian
+# for sys-vms with gnome network-manager & drivers (sys-net / sys-vpn)
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'apt-get install \
-	pciutils usbutils tar less psmisc nano unzip wget git libnotify-bin \
-	qubes-core-agent-networking qubes-core-agent-dom0-updates \
-	qubes-usb-proxy qubes-input-proxy-sender notification-daemon \
-	qubes-menus qubes-gpg-split qubes-mgmt-salt-vm-connector zenity \
-	network-manager network-manager-openconnect network-manager-openconnect-gnome \
-	network-manager-openvpn network-manager-openvpn-gnome \
-	qubes-core-agent-network-manager locales locales-all \
-	wireless-tools usb-modeswitch modem-manager-gui firmware-iwlwifi'
+	qubes-core-agent-networking \
+	qubes-menus \
+	qubes-mgmt-salt-vm-connector \
+	network-manager \
+	qubes-core-agent-network-manager \
+	network-manager-openconnect \
+	network-manager-openconnect-gnome \
+	network-manager-openvpn \
+	network-manager-openvpn-gnome \
+	firmware-iwlwifi \
+	modem-manager-gui \
+	libnotify-bin \
+	dunst \
+	qubes-usb-proxy'
 
-# More tools - this is optionally
+# optional (installed before but not needed)
+#	wireless-tools \
+#	usb-modeswitch \
+#	notification-daemon \
+
+# for sys-vms without gnome network manager & drivers (sys-usb / sys-firewall)
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
-  'dnf -y install tcpdump telnet nmap nmap-ncat'
+  'apt-get install \
+	qubes-core-agent-networking \ 
+	qubes-menus \
+	qubes-mgmt-salt-vm-connector \
+	qubes-core-agent-dom0-updates \
+	qubes-usb-proxy \
+	qubes-input-proxy-sender \
+	libnotify-bin \
+	dunst'
 
-#### just kept for reference (unsure if needed)
-#dbus-x11 tinyproxy iptables gnome-keyring iproute iputils 
-#polkit @hardware-support xfce4-notifyd'
+# optional:
+#	zenity - for file selection dialogs in dom0 (ex: Qubes Backup)
+
+# Notification daemons, two options (I prefer dunst)
+# 1) dunst libnotify-bin - minimal notification daemon (only one package)
+# 2) xfce4-notifyd - default notification daemon, will install the following packages as dependencies:
+#        libnotify-bin libstartup-notification0 libxcb-util1 libxfce4panel-2.0-4
+#        libxfce4ui-2-0 libxfce4ui-common libxfce4util-bin libxfce4util-common
+#        libxfce4util7 libxfconf-0-3 xfconf
+
+## Additional packages (installed in the past, not needed)
+#	pciutils usbutils iputils 
+#	tar less psmisc nano unzip wget git iproute \
+#	qubes-gpg-split notification-daemon locales locales-all \
+#	tcpdump telnet nmap nmap-ncat \
+#	dbus-x11 polkit @hardware-support
+
 
 ```
 Disposable Sys-VMs
@@ -47,8 +89,8 @@ See also: https://qubes-os.org/doc/disposable-customization
 Prepare disposable AppVM as template for (named) disposable sys-VMs
 -------------------------------------------------------------------
 ```
-sys_template=t-debian-10-sys
-dvm_sys_template=t-debian-10-sys-dvm
+sys_template=t_debian-11-sys
+dvm_sys_template=t_debian-11-sys-dvm
 
 # create a disposable template for the sys-vms
 qvm-create --template $sys_template --label red $dvm_sys_template
@@ -69,7 +111,7 @@ qvm-prefs $netvm memory 400
 qvm-prefs $netvm maxmem 0
 qvm-prefs $netvm vcpus 1
 qvm-prefs $netvm netvm ''
-qvm-service $fwvm network-manager on
+qvm-service $netvm network-manager on
 qvm-prefs $netvm autostart True
 qvm-prefs $netvm provides_network true
 qvm-features $netvm appmenus-dispvm ''
@@ -91,7 +133,7 @@ nano /etc/qubes-rpc/policy/qubes.UpdatesProxy
 Disposable sys-firewall
 -----------------------
 ```
-dvm_sys_template=t-debian-10-sys-dvm
+dvm_sys_template=t_debian-11-sys-dvm
 fwvm=sys-fw-dvm
 netvm=sys-net
 
@@ -114,7 +156,7 @@ qvm-remove -f sys-firewall
 Disposable sys-usb
 ------------------
 ```
-dvm_sys_template=t-debian-10-sys-dvm
+dvm_sys_template=t_debian-11-sys-dvm
 usbvm=sys-usb-dvm
 
 qvm-create -C DispVM -l green --template $dvm_sys_template $usbvm
@@ -125,8 +167,8 @@ qvm-prefs $usbvm maxmem 0
 qvm-prefs $usbvm vcpus 1
 qvm-prefs $usbvm netvm ''
 qvm-prefs $usbvm autostart true
-qvm-prefs $usbvm provides_network false
-qvm-service $fwvm network-manager off
+qvm-prefs $usbvm provides_network true
+qvm-service $usbvm network-manager off
 qvm-features $usbvm appmenus-dispvm ''
 
 # to find out PCI devices
@@ -147,4 +189,3 @@ nano /etc/qubes-rpc/policy/qubes.InputKeyboard
 sys-usb-dvm dom0 allow,user=root
 $anyvm $anyvm deny
 ```
- 
