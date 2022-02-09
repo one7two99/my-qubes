@@ -1,11 +1,10 @@
  Template for general a productivity VM
 =======================================
 
-
 ## fedora
 ```
-Template=fedora-33-minimal
-TemplateName=t-fedora-33-apps
+Template=fedora-34-minimal
+TemplateName=t_fedora-34-apps
 
 qvm-kill $TemplateName
 qvm-remove --force $TemplateName
@@ -13,12 +12,32 @@ qvm-clone $Template $TemplateName
 qvm-run --auto --pass-io --no-gui --user root $TemplateName \
   'dnf -y update'
   
-qvm-run --auto --pass-io --no-gui --user root $TemplateName \
-  'dnf install -y keepass klavaro libreoffice gedit gimp \
-  firefox qubes-usb-proxy pulseaudio-qubes nano git mc evince \
-  less qubes-gpg-split qubes-core-agent-networking unzip \
-  nautilus wget qubes-core-agent-nautilus evince pinentry-gtk \
-  evince-nautilus nautilus-sendto nautilus-search-tool borgbackup'
+qvm-run --auto --pass-io --no-gui --user root $TemplateName 'dnf install -y \
+	qubes-usb-proxy \
+	pulseaudio-qubes \
+	qubes-gpg-split \
+	qubes-core-agent-networking \
+	qubes-mgmt-salt-vm-connector \
+	zenity \
+	keepass \
+	klavaro \
+	libreoffice \
+	gedit \
+	gimp \
+	firefox \
+	nautilus \
+	qubes-core-agent-nautilus \
+	nautilus-search-tool \
+	evince \
+	evince-nautilus \
+	pinentry-gtk \
+	unzip \
+	nano \
+	git \
+	mc \
+	less \
+	wget \
+	borgbackup'
 ```
 
 ## debian
@@ -39,6 +58,11 @@ qvm-run --auto --pass-io --no-gui --user root $TemplateName \
   nautilus wget qubes-core-agent-nautilus evince pinentry-gtk2 borgbackup'
 ```
 
+## set App-template as defaut template
+```
+qubes-prefs --set default_template $TemplateName
+```
+
 ## more apps
 ```
 qvm-run --auto --pass-io --no-gui --user root $TemplateName \
@@ -47,10 +71,5 @@ qvm-run --auto --pass-io --no-gui --user root $TemplateName \
   terminus-fonts dejavu-sans-fonts dejavu-sans-mono-fonts xclip'
 
 qvm-shutdown --wait $TemplateName
-```
-
-## set App-template as defaut template
-```
-qubes-prefs --set default_template $TemplateName
 ```
 
