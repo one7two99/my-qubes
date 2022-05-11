@@ -505,7 +505,7 @@ Create a new file OWA-Webmail.desktop
 ```
 [Desktop Entry]
 Encoding=UTF-8
-Name=globits Webmail (OWA)
+Name=Webmail (OWA)
 Icon=my-icon
 Type=Application
 Categories=Office;
