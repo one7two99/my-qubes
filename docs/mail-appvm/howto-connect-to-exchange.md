@@ -509,5 +509,5 @@ Name=globits Webmail (OWA)
 Icon=my-icon
 Type=Application
 Categories=Office;
-Exec=xdg-open https://owa.globits.de/owa/
+Exec=xdg-open https://owa.DOMAIN.de/owa/
 ```
