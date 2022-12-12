@@ -12,18 +12,36 @@ AppVMName=my-media
 netvm=sys-net
 qvm-clone $Template $TemplateName
 
-qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt-get update && apt-get -y upgrade && apt autoremove'
-qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt-get install zenity qubes-core-agent-networking pulseaudio-qubes wget qubes-usb-proxy'
-qvm-run --auto --pass-io --no-gui --user root $TemplateName 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list'
+qvm-run --auto --pass-io --no-gui --user root $TemplateName \
+	'apt-get update && apt-get -y upgrade && apt autoremove'
+
+qvm-run --auto --pass-io --no-gui --user root $TemplateName \
+	'apt-get install \
+		zenity \
+		qubes-core-agent-networking \
+		pulseaudio-qubes \
+		wget \
+		qubes-usb-proxy'
+
+qvm-run --auto --pass-io --no-gui --user root $TemplateName \
+	'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list'
+
 # Enable networking for template
 qvm-prefs $TemplateName netvm $netvm
-qvm-run --auto --pass-io --no-gui --user root $TemplateName 'wget -O- https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor > /etc/apt/trusted.gpg.d/google.gpg'
-qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt-get update'
-qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt-get install google-chrome-stable'
+qvm-run --auto --pass-io --no-gui --user root $TemplateName \
+	'wget -O- https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor > /etc/apt/trusted.gpg.d/google.gpg'
+
+qvm-run --auto --pass-io --no-gui --user root $TemplateName \
+	'apt-get update'
+
+qvm-run --auto --pass-io --no-gui --user root $TemplateName \
+	'apt-get install google-chrome-stable'
+
+
 # locale: Cannot set LC_CTYPE to default locale: No such file or directory
 qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt-get install locales locales-all'
 # Open Broadcaster Studio (OBS) & VLC & Audacity
-qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt-get install ffmpeg v4l2loopback-dkms vlc audacity obs-studio locales locales-all'
+qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt-get install ffmpeg v4l2loopback-dkms vlc audacity obs-studio'
 # Disable networking for template
 qvm-prefs $TemplateName netvm ''
 
@@ -55,3 +73,4 @@ qvm-shutdown --wait $TemplateName
 
 qvm-create --template=$TemplateName --label=orange $AppVMName
 ```
+
