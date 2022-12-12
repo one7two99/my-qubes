@@ -1,12 +1,12 @@
-================== 
- t-fedora-28-work -> ok
-================== 
-basetemplate=fedora-30-minimal
-worktemplatevm=t-fedora-30-work
-DownloadAppVM=my-media
-WorkAppVM=my-globits
+t_fedora-36-work
+================ 
+a template mainly used for office-work / communucation etc.
 
-#templatevm=t-fedora-29-work
+```
+basetemplate=fedora-36-minimal
+worktemplatevm=t_fedora-36-office
+DownloadAppVM=my-media
+WorkAppVM=my-office
 
 # Remove an existing template
 if [ -d /var/lib/qubes/vm-templates/$worktemplatevm ];
@@ -20,21 +20,87 @@ qvm-run --auto --user root --pass-io --no-gui $worktemplatevm \
   'dnf -y update'
 
 qvm-run --auto --user root --pass-io --no-gui $worktemplatevm \
-  'dnf install -y emacs keepass libreoffice gedit gimp gnome-terminal \
-  firefox nano git mc terminus-fonts less unzip dejavu-sans-fonts \
-  pinentry-gtk qubes-gpg-split qubes-core-agent-networking \
-  qubes-usb-proxy pulseaudio-qubes gstreamer gstreamer-plugins-base \
-  libffi libpng12 libXScrnSaver libsigc++20 pangox-compat \
-  xclip iputils iproute \
-  qubes-core-agent-qrexec qubes-core-agent-systemd polkit \
-  notification-daemon qubes-input-proxy-sender'
+	'dnf install -y \
+		gedit \
+		nano \
+		git \
+		mc \
+		less \
+		unzip \
+		pinentry-gtk \
+		qubes-gpg-split \
+		qubes-core-agent-networking \
+		qubes-usb-proxy \
+		libffi \
+		libpng12 \
+		libXScrnSaver \
+		libsigc++20 \
+		iputils \
+		iproute \
+		qubes-core-agent-qrexec \
+		qubes-core-agent-systemd \
+		notification-daemon \
+		qubes-input-proxy-sender \
+		zypper'
+
+#old
+		pulseaudio-qubes \
+		firefox \
+		zenity \
+		gimp \
+		keepass \
+		libreoffice \
+		gstreamer \
+		gstreamer-plugins-base \
+		pangox-compat \
+
+# Slack
+# Download: https://slack.com/downloads/instructions/fedora
+qvm-run --auto --pass-io --no-gui --user root $worktemplatevm \
+	'dnf -y install libappindicator-gtk3'
+qvm-run --auto --pass-io --no-gui --user root $worktemplatevm \
+	'rpm -i /home/user/QubesIncoming/*/slack*'
+
+# Teams
+qvm-prefs $worktemplatevm  netvm sys-firewall
+qvm-run --auto --pass-io --no-gui --user root $worktemplatevm \
+	'rpm --import https://packages.microsoft.com/keys/microsoft.asc'
+qvm-run --auto --pass-io --no-gui --user root $worktemplatevm \
+	'rpm -i /home/user/QubesIncoming/*/teams*'
+
+# Zoom
+qvm-run --auto --pass-io --no-gui --user root $worktemplatevm \
+	'dnf install ibus ibus-m17n libxkbcommon-x11 mesa-dri-drivers'
+qvm-run --auto --pass-io --no-gui --user root $worktemplatevm \
+	'rpm -i /home/user/QubesIncoming/*/zoom*'
+
+# WebEx
+qvm-run --auto --pass-io --no-gui --user root $worktemplatevm \
+        'dnf install lshw upower'
+qvm-run --auto --pass-io --no-gui --user root $worktemplatevm \
+	'rpm -i /home/user/QubesIncoming/*/Webex*'
+
+# Horizon View
+qvm-run --pass-io --no-gui --user root $worktemplatevm \
+	'chmod +x /home/user/QubesIncoming/*/VMware* && \
+	/home/user/QubesIncoming/*/VMware*'
+# Install Real-Time Audio-Video
+
+##### end
+
 
 ### AnyConnect VPN - OpenConnect
 qvm-run --auto --pass-io --no-gui --user root $worktemplatevm \
- 'dnf -y install NetworkManager-openconnect network-manager-applet qubes-core-agent-network-manager \
-  NetworkManager-openconnect-gnome NetworkManager-vpnc-gnome NetworkManager-openvpn-gnome NetworkManager-openvpn'
+	'dnf -y install \
+		NetworkManager-openconnect \
+		network-manager-applet \
+		qubes-core-agent-network-manager \
+		NetworkManager-openconnect-gnome \
+		NetworkManager-vpnc-gnome \
+		NetworkManager-openvpn-gnome \
+		NetworkManager-openvpn'
 
-### Install Flash
+### Install Flash (OLD not needed anymore because flash ... is dead :-)
 # Download Flash (Info: NPAPI is for Firefox // PPAPI is for Chrome)
 https://get.adobe.com/de/flashplayer/otherversions/
 Download: Linux (64-bit) (rpm) - NPAPI
@@ -52,6 +118,7 @@ qvm-shutdown --wait $worktemplatevm
 # https://my.vmware.com/web/vmware/details?downloadGroup=CART19FQ4_LIN64_410&productId=578
 qvm-run --auto --pass-io $DownloadAppVM 'cat Downloads/VMware*.bundle' | \
   qvm-run --pass-io $worktemplatevm 'cat > /home/user/horizon-client.bundle'
+
 qvm-run --pass-io --no-gui --user root $worktemplatevm \
    'chmod +x /home/user/horizon-client.bundle && \
    /home/user/horizon-client.bundle'
@@ -70,4 +137,4 @@ qvm-service --enable $WorkAppVM network-manager
 # Network Manager Icon > VPN Connections > Configure VPN
 # Add > Cisco AnyConnect Compatible VPN (openconnect)
 
-
+```
