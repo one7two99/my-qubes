@@ -505,9 +505,9 @@ Create a new file OWA-Webmail.desktop
 ```
 [Desktop Entry]
 Encoding=UTF-8
-Name=Webmail (OWA)
+Name=globits Webmail (OWA)
 Icon=my-icon
 Type=Application
 Categories=Office;
-Exec=xdg-open https://owa.DOMAIN.de/owa/
+Exec=xdg-open https://owa.globits.de/owa/
 ```

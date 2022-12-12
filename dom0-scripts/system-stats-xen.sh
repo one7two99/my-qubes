@@ -3,7 +3,7 @@
 # presented in Qubes OS User Groups
 # https://github.com/tasket/Qubes-scripts/blob/master/system-stats-xen
 
-delay=10
+delay=5
 #sensor_lines='Package id 0|fan1'
 
 lnparse () {

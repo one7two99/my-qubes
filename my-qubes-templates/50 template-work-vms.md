@@ -1,12 +1,12 @@
-t_fedora-36-work
-================ 
-a template mainly used for office-work / communucation etc.
-
-```
+================== 
+ t_fedora-34-work -> ok
+================== 
 basetemplate=fedora-36-minimal
 worktemplatevm=t_fedora-36-office
 DownloadAppVM=my-media
-WorkAppVM=my-office
+WorkAppVM=my-globits
+
+#templatevm=t-fedora-29-work
 
 # Remove an existing template
 if [ -d /var/lib/qubes/vm-templates/$worktemplatevm ];
@@ -46,6 +46,7 @@ qvm-run --auto --user root --pass-io --no-gui $worktemplatevm \
 #old
 		pulseaudio-qubes \
 		firefox \
+
 		zenity \
 		gimp \
 		keepass \
@@ -100,7 +101,7 @@ qvm-run --auto --pass-io --no-gui --user root $worktemplatevm \
 		NetworkManager-openvpn-gnome \
 		NetworkManager-openvpn'
 
-### Install Flash (OLD not needed anymore because flash ... is dead :-)
+### Install Flash
 # Download Flash (Info: NPAPI is for Firefox // PPAPI is for Chrome)
 https://get.adobe.com/de/flashplayer/otherversions/
 Download: Linux (64-bit) (rpm) - NPAPI
@@ -137,4 +138,4 @@ qvm-service --enable $WorkAppVM network-manager
 # Network Manager Icon > VPN Connections > Configure VPN
 # Add > Cisco AnyConnect Compatible VPN (openconnect)
 
-```
+

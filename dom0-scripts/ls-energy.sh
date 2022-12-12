@@ -8,5 +8,5 @@ qubes_sum=$(xl list | grep -v Domain-0 | grep -v dm 2> /dev/null | tail -n +2 | 
 battery_runtime=`upower -d | grep "time to empty" | sed -n '2p' | gawk '{ print $4 }' | cut -c1-4`
 discharge_rate=`upower -d | grep energy-rate | sed -n '2p' | gawk '{ print $2 }' | cut -c1-4`
 
-echo $qubes_sum"q|"$ram_sum"G|"$discharge_rate"W/h|"$battery_runtime"h"
+echo " "$qubes_sum"q|"$ram_sum"G|"$discharge_rate"W/h|"$battery_runtime"h "
 

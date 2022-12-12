@@ -3,7 +3,7 @@
 ===============
 
 # Create a new Disposable App-VM which is based on a custom template t-fedora-2
-template4dvm=t-fedora-33-apps
+template4dvm=t_fedora-35-apps
 newdvmtemplatename=my-dvm
 qvm-create --template $template4dvm --label red --property template_for_dispvms=True --class=AppVM $newdvmtemplatename
  
@@ -18,8 +18,8 @@ qubes-prefs --set default_dispvm $newdvmtemplatename
 
 ###usefull commands
 # remove old dvm, change all references to this VM before in the Qubes settings
-qvm-prefs fedora-26 installed_by_rpm false
-qvm-remove fedora-26
+#qvm-prefs fedora-26 installed_by_rpm false
+#qvm-remove fedora-26
 
 # Change the Disp-VM from an AppVM (here: my-untrusted)
 appvmname=my-untrusted

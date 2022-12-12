@@ -14,8 +14,8 @@
 qvm-run --pass-io --no-gui YOURAPPVM 'cat ~/26-sys-pihole.md' > sys-pihole.txt
 
 # some variables to keep the setup flexible - change the names here
-PiholeVM=sys-pidns2
-TemplateVM=debian-10-minimal
+PiholeVM=sys-pihole1
+TemplateVM=debian-11-minimal
 
 ### Update template
 qvm-run --auto --user root --pass-io --no-gui $TemplateVM 'apt-get update && apt-get upgrade'
@@ -23,10 +23,22 @@ qvm-run --auto --user root --pass-io --no-gui $TemplateVM 'apt-get install \
   qubes-core-agent-networking qubes-menus'
 qvm-shutdown $TemplateVM
 
+
 ### create new standalone qube
 qvm-create --template $TemplateVM --class StandaloneVM --label red $PiholeVM
 qvm-prefs $PiholeVM provides_network true
+qvm-prefs $PiholeVM netvm sys-firewall
 qvm-service $PiholeVM qubes-firewall on
+
+# Conigure locales
+qvm-run --auto --user root --pass-io --no-gui $PiholeVM 'dpkg-reconfigure locales'
+# install the following locales:  110,111,112,158
+# 110. de_DE ISO-8859-1
+# 111. de_DE.UTF-8 UTF-8
+# 112. de_DE@euro ISO-8859-15 
+# 158. en_US.UTF-8 UTF-8
+# Choose the following default locale: 6. en_US.UTF-8
+
 
 ### tools
 qvm-run --auto --user root --pass-io --no-gui $PiholeVM 'apt-get install \
@@ -39,7 +51,11 @@ qvm-run --user root --pass-io --no-gui $PiholeVM 'systemctl stop resolvconf && s
 ### Download and install pihole
 qvm-run --auto --user root --pass-io --no-gui $PiholeVM 'git clone --depth 1 https://github.com/pi-hole/pi-hole.git Pi-hole'
 qvm-run --auto --user root $PiholeVM "xterm -e 'cd Pi-hole && cd automated\ install && bash basic-install.sh && read'"
-# >>> write down login credentials!! <<<
+# >>> write down login credentials!! Then press Enter to close window <<<
+10.137.0.23/admin
+h3rpq30x
+
+
 
 ### create file which will be run each time a qubes is started
 qvm-run --user=root --pass-io --no-gui $PiholeVM 'mkdir -p /rw/config/network-hooks.d'
@@ -92,6 +108,7 @@ qvm-run --user root --pass-io --no-gui $PiholeVM 'iptables -L -v'
 qvm-run --user root --pass-io --no-gui $PiholeVM 'iptables -L -v -nat'
 
 # Anpassung DNSmasg
+# IMPORTANT: this needs to be done after each Pihole-Update (pihole -up)
 qvm-run --user root $PiholeVM "xterm -e 'nano /etc/dnsmasq.conf'"
 # change file to:
 interface=lo
@@ -100,9 +117,9 @@ conf-dir=/etc/dnsmasq.d
 
 ### Setup unbound with NextDNS.io-over-TLS
 See: https://blog.cyclemap.link/2020-01-11-unbound
-# Install & Enable unbound
-qvm-run --pass-io --no-gui --user root $PiholeVM 'apt-get install -y unbound && \
-   systemctl enable unbound'
+# Install unbound
+qvm-run --pass-io --no-gui --user root $PiholeVM 'apt-get install -y unbound'
+
 
 # Configure Unbound to use your NextDNS configuration
 qvm-run --user root $PiholeVM 'mkdir -p /etc/unbound/unbound.conf.d'
@@ -132,8 +149,9 @@ forward-zone:
 ### Update keys
 qvm-run --pass-io --no-gui --user root $PiholeVM 'update-ca-certificates'
 qvm-run --pass-io --no-gui --user root $PiholeVM 'sudo -u unbound unbound-anchor'
-qvm-run --pass-io --no-gui --user root $PiholeVM 'systemctl restart unbound'
 
+### Enable & start unbound
+qvm-run --pass-io --no-gui --user root $PiholeVM 'systemctl enable unbound && systemctl start unbound'
 
 ### reboot
 qvm-shutdown $PiholeVM 
