@@ -3,23 +3,22 @@
 
 ## fedora
 ```
-Template=fedora-34-minimal
-TemplateName=t_fedora-34-apps
+Template=fedora-35-minimal
+TemplateName=t_fedora-35-apps
 
 qvm-kill $TemplateName
 qvm-remove --force $TemplateName
 qvm-clone $Template $TemplateName
-qvm-run --auto --pass-io --no-gui --user root $TemplateName \
-  'dnf -y update'
+#qvm-run --auto --pass-io --no-gui --user root $TemplateName 'dnf -y update'
   
 qvm-run --auto --pass-io --no-gui --user root $TemplateName 'dnf install -y \
+	qubes-core-agent-networking \
 	qubes-usb-proxy \
 	pulseaudio-qubes \
 	qubes-gpg-split \
-	qubes-core-agent-networking \
 	qubes-mgmt-salt-vm-connector \
 	zenity \
-	keepass \
+	keepassxc \
 	klavaro \
 	libreoffice \
 	gedit \
@@ -38,6 +37,15 @@ qvm-run --auto --pass-io --no-gui --user root $TemplateName 'dnf install -y \
 	less \
 	wget \
 	borgbackup'
+
+qvm-run --auto --pass-io --no-gui --user root $TemplateName 'dnf install -y \
+	--allowerasing pulseaudio-qubes pulseaudio'
+```
+
+# Problem installing qubes-pulseaudio under fedora-36
+```
+qvm-run --auto --pass-io --no-gui --user root $TemplateName 'dnf install -y \
+        keepass'
 ```
 
 ## debian
@@ -58,18 +66,31 @@ qvm-run --auto --pass-io --no-gui --user root $TemplateName \
   nautilus wget qubes-core-agent-nautilus evince pinentry-gtk2 borgbackup'
 ```
 
-## set App-template as defaut template
-```
-qubes-prefs --set default_template $TemplateName
-```
-
 ## more apps
 ```
 qvm-run --auto --pass-io --no-gui --user root $TemplateName \
   'dnf install -y emacs transmission transmission-cli \
   gnome-terminal-nautilus polkit e2fsprogs gnome-terminal \
   terminus-fonts dejavu-sans-fonts dejavu-sans-mono-fonts xclip'
+```
 
+## set App-template as defaut template
+```
+qubes-prefs --set default_template $TemplateName
+```
+
+# Shutdown
+```
 qvm-shutdown --wait $TemplateName
 ```
 
+# Set this template as Template for specific AppVMs
+```
+MyAppVM=my-untrusted
+qvm-prefs --set $MyAppVM template $TemplateName
+```
+
+# Set this template as template for management VM
+```
+qvm-prefs --set default-mgmt-dvm template $TemplateName
+```
