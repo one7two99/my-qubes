@@ -10,7 +10,8 @@ https://www.ubuntupit.com/best-conky-themes-for-linux/
 Thanks
 ------
 This setup was heavily inspired (mainly I just made some changes) from https://github.com/3hhh/qubes-conky.
-
+Jump over and leave a star there.
+You can also find some other interesting qubes stuff there!
 
 Install conky in dom0
 ---------------------
