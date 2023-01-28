@@ -1,6 +1,8 @@
 A simple conky configuration for dom0
 =====================================
 
+![IMG_20230128_212336_022](https://user-images.githubusercontent.com/831382/215289219-987338a2-9630-45f0-ac1c-c8245095d99a.jpg)
+
 Conky is a well know tool to display monitoring variables on the desktop and can adopted in many (!) ways.
 A good impression what can be done with conky can be found here;
 
