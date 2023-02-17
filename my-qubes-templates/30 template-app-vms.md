@@ -91,19 +91,27 @@ qvm-run --auto --pass-io --no-gui --user root $TemplateName \
 qvm-shutdown --wait $TemplateName
 ```
 
-## Further usefull commands
+## Further usefull commands to setup defaults
 
-### Set default DispVM for qubes
+### Set DVM-template as default DispVM for AppVMs
 ```
 qubes-prefs --set default_dispvm $newdvmtemplatename
 ```
+### Set App-template as default template for new AppVMs
+```
+qubes-prefs --set default_template $TemplateName
+```
+### Use this template as template for the Qubes management VM
+```
+qvm-prefs --set default-mgmt-dvm template $TemplateName
+```
 
+## AppVM specific commands
 ### Change the Disp-VM from an AppVM (here: my-untrusted)
 ```
 appvmname=my-untrusted
 qvm-prefs --set $appvmname default_dispvm $newdvmtemplatename
 ```
-
 Try to start something from this AppVM in a disposable VM
 This should start a new dispvm which is based on your dvm-App
 ```
@@ -115,19 +123,8 @@ qvm-run --auto $appvmname 'qvm-open-in-dvm https:/google.de'
 qvm-run --dispvm=<DISPVM> --service qubes.StartApp+<COMMAND>
 ```
 
-### set App-template as defaut template
-```
-qubes-prefs --set default_template $TemplateName
-```
-
-# Set this template as Template for specific AppVMs
+### Set this template as Template for specific AppVMs
 ```
 MyAppVM=my-untrusted
 qvm-prefs --set $MyAppVM template $TemplateName
 ```
-
-# Set this template as template for management VM
-```
-qvm-prefs --set default-mgmt-dvm template $TemplateName
-```
-
