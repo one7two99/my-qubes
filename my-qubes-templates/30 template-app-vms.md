@@ -1,7 +1,7 @@
  Template for general a productivity VM
 =======================================
 
-## fedora
+## fedora based general AppVM
 ```
 Template=fedora-35-minimal
 TemplateName=t_fedora-35-apps
@@ -37,18 +37,31 @@ qvm-run --auto --pass-io --no-gui --user root $TemplateName 'dnf install -y \
 	less \
 	wget \
 	borgbackup'
+```
 
+### Problem installing qubes-pulseaudio under fedora-36
+```
 qvm-run --auto --pass-io --no-gui --user root $TemplateName 'dnf install -y \
 	--allowerasing pulseaudio-qubes pulseaudio'
 ```
 
-# Problem installing qubes-pulseaudio under fedora-36
+### Set this template as Template for a disposable VM
+Create a new Disposable App-VM which is based on a custom template t-fedora-2
 ```
-qvm-run --auto --pass-io --no-gui --user root $TemplateName 'dnf install -y \
-        keepass'
+template4dvm=t_fedora-35-apps
+newdvmtemplatename=my-dvm
+qvm-create --template $template4dvm --label red --property template_for_dispvms=True --class=AppVM $newdvmtemplatename
 ```
 
-## debian
+Fix menu entry from Domain: my-dvm to Disposable: my-dvm
+- https://groups.google.com/forum/#!msg/qubes-users/gfBfqTNzUIg/sbPp-pyiCAAJ
+- https://github.com/QubesOS/qubes-issues/issues/1339#issuecomment-338813581
+```
+qvm-features $newdvmtemplatename appmenus-dispvm 1
+qvm-sync-appmenus --regenerate-only $newdvmtemplatename
+```
+
+## debian based general AppVM
 ```
 Template=debian-10-minimal
 TemplateName=t-debian-10-apps
@@ -65,8 +78,7 @@ qvm-run --auto --pass-io --no-gui --user root $TemplateName \
   less qubes-gpg-split qubes-core-agent unzip \
   nautilus wget qubes-core-agent-nautilus evince pinentry-gtk2 borgbackup'
 ```
-
-## more apps
+additional apps which might be useful in a general AppVM template
 ```
 qvm-run --auto --pass-io --no-gui --user root $TemplateName \
   'dnf install -y emacs transmission transmission-cli \
@@ -74,14 +86,38 @@ qvm-run --auto --pass-io --no-gui --user root $TemplateName \
   terminus-fonts dejavu-sans-fonts dejavu-sans-mono-fonts xclip'
 ```
 
-## set App-template as defaut template
-```
-qubes-prefs --set default_template $TemplateName
-```
-
-# Shutdown
+## Shutdown
 ```
 qvm-shutdown --wait $TemplateName
+```
+
+## Further usefull commands
+
+### Set default DispVM for qubes
+```
+qubes-prefs --set default_dispvm $newdvmtemplatename
+```
+
+### Change the Disp-VM from an AppVM (here: my-untrusted)
+```
+appvmname=my-untrusted
+qvm-prefs --set $appvmname default_dispvm $newdvmtemplatename
+```
+
+Try to start something from this AppVM in a disposable VM
+This should start a new dispvm which is based on your dvm-App
+```
+qvm-run --auto $appvmname 'qvm-open-in-dvm https:/google.de'
+```
+
+### Start an App in a DispVM from dom0
+```
+qvm-run --dispvm=<DISPVM> --service qubes.StartApp+<COMMAND>
+```
+
+### set App-template as defaut template
+```
+qubes-prefs --set default_template $TemplateName
 ```
 
 # Set this template as Template for specific AppVMs
@@ -94,3 +130,4 @@ qvm-prefs --set $MyAppVM template $TemplateName
 ```
 qvm-prefs --set default-mgmt-dvm template $TemplateName
 ```
+
