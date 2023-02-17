@@ -33,7 +33,8 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
 	qubes-core-agent-dom0-updates \
 	qubes-usb-proxy \
 	qubes-input-proxy-sender \
-	dunst libnotify-bin'
+	dunst libnotify-bin \
+	git'
 
 # for sys-vms with gnome network-manager & drivers (sys-net)
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
