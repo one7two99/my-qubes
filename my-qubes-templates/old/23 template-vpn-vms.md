@@ -1,166 +1,69 @@
-VPN ProxyVM with ExpressVPN
-===========================
+Use ProtonVPN in Qubes via an OpenVPN NetVM
+===========================================
 
+This "sys-protonvpn" will act as a NetVM (VPN-Proxy) for all Qubes which are using this qubes as NetVM.
+It's based on my t_debian-11-sys template which is itself based on a customized debian-11-minimal template.
+Information how this template has been built can be found here:
+https://github.com/one7two99/my-qubes/blob/master/my-qubes-templates/20%20debian-based-sys-vms.md
+
+I'm running this VPN-Proxy-VPN in the following setup:
+
+sys-net <- sys-firewall2 <- sys-protonvpn <- sys-firewall1 <- sys-pihole <- <OTHER QUBES>
+	
 ```
-sys_template=t-fedora-33-sys
-dvm_sys_template=t-fedora-33-sys-dvm
-appvm=sys-vpn-dvm
-netvm=sys-net-dvm
-fwvm=sys-fw-dvm
+templatevm=t_debian-11-sys
+vpnvm=sys-protonvpn
+netvm=sys-net
 
-Note:
-See setup of sys-vms to build the t-fedora-33-sys & t-fedora-33-sys-dvm-template
-
-# 0) Create a DispVM
-sys_template=t-debian-10-sys
-dvm_sys_template=t-debian-10-sys-dvm
-
-# create a disposable template for the sys-vms
-qvm-create --template $sys_template --label red $dvm_sys_template
-qvm-prefs $dvm_sys_template template_for_dispvms True
-qvm-prefs $dvm_sys_template netvm ''
-qvm-features $dvm_sys_template appmenus-dispvm 1
-
-# 1) install VPN script in templatevm
-qvm-prefs $sys_template netvm $netvm
-qvm-run --auto --pass-io --no-gui --user root $sys_template  \
+# install VPN script in templatevm
+qvm-prefs $templatevm netvm $netvm
+qvm-run --auto --pass-io --no-gui --user root $templatevm  \
    'mkdir -p /rw/config/vpn && \
     cd /root && \
     git clone https://github.com/tasket/Qubes-vpn-support.git && \
     cd Qubes-vpn-support && \
     bash ./install'
-qvm-prefs $sys_template netvm ''
-qvm-shutdown --wait $sys_template
+qvm-prefs $templatevm netvm ''
+qvm-shutdown --wait $templatevm
 
-# 2) configure disposable vm template
+# Create vpn NetVM
+qvm-create -l orange --template $templatevm $vpnvm
+qvm-prefs $vpnvm memory 400
+qvm-prefs $vpnvm maxmem 1024
+qvm-prefs $vpnvm vcpus 1
+qvm-prefs $vpnvm netvm $netvm
+qvm-prefs $vpnvm provides_network true
+qvm-service $vpnvm vpn-handler-openvpn on
 
-dvm_sys_template=t-debian-10-dvm
-
-#set bind dirs in DVM template
-qvm-run --auto --pass-io --user root $dvm_sys_template 'xterm -e \
+#set bind dirs in VPNvm
+qvm-run --auto --pass-io --user root $vpnvm 'xterm -e \
   "mkdir -p /rw/config/qubes-bind-dirs.d && \
    mkdir -p /rw/config/vpn"'
-qvm-run --auto --pass-io --user root $dvm_sys_template 'xterm -e "nano /rw/config/qubes-bind-dirs.d/50_user.conf"'
+
+qvm-run --auto --pass-io --user root $vpnvm 'xterm -e "nano /rw/config/qubes-bind-dirs.d/50_user.conf"'
 # add: binds+=( '/usr/lib/qubes' )
 # add: binds+=( '/rw/config/vpn' )
-qvm-shutdown --wait $dvm_sys_template
-
-# edit the qubes-vpn-setup script and disable check of proxy VM in the config section (disable IF check)
-qvm-run --auto --pass-io --user root $dvm_sys_template 'xterm -e "nano /usr/lib/qubes/qubes-vpn-setup"'
-####### comment out the following sections #######
---config)
-    . /usr/lib/qubes/init/functions
-#    if is_proxyvm ; then
-        mkdir -p /rw/config/vpn
-        firewall_link /usr/lib/qubes
-        do_userpass
-        echo "Done!"
-#    else
-#        echo "Error: Not a proxyVM. Check instructions."
-#    fi
-;;
-
---config-nm)
-    . /usr/lib/qubes/init/functions
-#    if is_proxyvm ; then
-        firewall_link /usr/lib/qubes
-        echo "Done!"
-#    else
-#        echo "Error: Not a proxyVM. Please check instructions."
-#        exit 1
-#    fi
-;;
+qvm-shutdown --wait $vpnvm
 
 
-
-# download OpenVPN config for ExpressVPN and copy & paste it to /rw/config/vpn
-# paste the content of the .ovpn-file here:
-qvm-run --auto --pass-io --user root $dvm_sys_template 'xterm -e "nano /rw/config/vpn/expressvpn_frankfurt.ovpn"'
-
-# link the config file for use with qubes-vpn-script
-vm-run --auto --pass-io --user root $dvm_sys_template \
-	'cd /rw/config/vpn && ln -s expressvpn* vpn-client.conf'
+# Copy the content from your ProtonVPN OpenVPN-Config file to clipboard
+qvm-run --auto --pass-io --user root $vpnvm 'xterm -e "nano /rw/config/vpn/vpn-client.conf"'
+# Paste it into the VPN-VM to /rw/config/vpn/vpn-client.conf
+# using Qubes Shift+Strg+C and Shift+Strg+V top copy & past between Qubes
+# To link to your username/password file vhange the line
+auth-user-info
+# to
+auth-user-info user-password.txt
 
 # run config script and add your credentials
-qvm-run --auto --pass-io --user root $dvm_sys_template 'xterm -e "/usr/lib/qubes/qubes-vpn-setup --config"'
+# Credentials can be found in ProtonVPN WebGUI under OpenVPN/IKEv2
+qvm-run --auto --pass-io --user root $vpnvm 'xterm -e "/usr/lib/qubes/qubes-vpn-setup --config"'
+
 # check credentials
-qvm-run --auto --pass-io --user root --pass-io $dvm_sys_template 'cat /rw/config/vpn/userpassword.txt'
-qvm-shutdown --wait $dvm_sys_template
+qvm-run --auto --pass-io --user root --pass-io $vpnvm 'cat /rw/config/vpn/userpassword.txt'
 
+# Shutdown VPN-Qube
+qvm-shutdown --wait $vpnvm
 
-# Create Disposable sys-vpn-dvm
-qvm-create -C DispVM -l orange --template $dvm_sys_template $appvm
-qvm-prefs $appvm memory 400
-qvm-prefs $appvm maxmem 1024
-qvm-prefs $appvm vcpus 1
-qvm-prefs $appvm netvm $netvm
-qvm-features $appvm appmenus-dispvm ''
-qvm-prefs $appvm provides_network true
-qvm-service $appvm vpn-handler-openvpn on
-
-# Starting up the disposable sys-vpn-dvm should establish a tunnel
-qvm-start $appvm
-
-# Use the sys-vpn-dvm as net-vm for sys-firewall
-qvm-prefs $fwvm netvm $appvm
-```
-
-
-Connect to a Cisco AnyConnect VPN automatically from CLI using OpenConnect
-==========================================================================
-
-Content of /rw/config/qubes-firewall-user-script:
-```
-#!/bin/sh
-
-# This script is called in AppVMs after every firewall update (configuration
-# change, starting some VM etc). This is a good place to write own custom
-# firewall rules, in addition to autogenerated ones. Remember that in most cases
-# you'll need to insert the rules at the beginning (iptables -I) for it to be
-# effective.
-
-## Qubes VPN
-## https://www.qubes-os.org/doc/vpn/
-iptables -I FORWARD -o eth0 -j DROP
-iptables -I FORWARD -i eth0 -j DROP
-ip6tables -I FORWARD -o eth0 -j DROP
-ip6tables -I FORWARD -i eth0 -j DROP
-```
-
-Content of /rw/config/rc.local
-
-```
-#!/bin/sh
-
-# This script will be executed at every VM startup, you can place your own
-# custom commands here. This includes overriding some configuration in /etc,
-# starting services etc.
-
-# Example for overriding the whole CUPS configuration:
-#  rm -rf /etc/cups
-#  ln -s /rw/config/cups /etc/cups
-#  systemctl --no-block restart cups
-
-# Connect automatically per VPN
-# https://www.qubes-os.org/doc/vpn/
-# Automatically connect to the VPN once Internet is up
-while ! ping -c 1 -W 1 1.1.1.1; do
-   sleep 1
-done
-
-## Autoconnect using a network Manager profile
-#PWDFILE="/rw/config/NM-system-connections/secrets/passwd-file.txt"
-#nmcli connection up <VPNPROFILENAME> passwd-file $PWDFILE
-
-## Autoconnect using Openconnect from CLI
-VPNHost=<HOSTNAME>
-VPNUser=<USERNAME>
-VPNServerCert=<CERTIFICATE-FINGERPRINT>
-PWDFILE="/rw/config/secrets/password.txt"
-openconnect $VPNHost --protocol=anyconnect --user=$VPNUser --servercert=$VPNServerCert --passwd-on-stdin < $PWDFILE
-```
-
-Content of /rw/config/secrets/password.txt
-```
-<YOUR-PASSWORD>
+# Use this VPNvm as netvm on all qubes which should connect via VPN
 ```
