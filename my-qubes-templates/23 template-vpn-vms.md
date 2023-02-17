@@ -37,8 +37,7 @@ qvm-service $vpnvm vpn-handler-openvpn on
 
 #set bind dirs in VPNvm
 qvm-run --auto --pass-io --user root $vpnvm 'xterm -e \
-  "mkdir -p /rw/config/qubes-bind-dirs.d && \
-   mkdir -p /rw/config/vpn"'
+  "mkdir -p /rw/config/qubes-bind-dirs.d"'
 
 qvm-run --auto --pass-io --user root $vpnvm 'xterm -e "nano /rw/config/qubes-bind-dirs.d/50_user.conf"'
 # add: binds+=( '/usr/lib/qubes' )
