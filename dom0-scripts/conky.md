@@ -27,8 +27,13 @@ conky configuration
 -------------------
 This is an example for a simple conky-configuration, it contains of a helper script "xenmem-conky" and the config-file "qubes-conky.conf".
 
+Attention:
+This conky configuration will also show the external IP adress of sys-net ("real external IP") and the external IP of my firewall sys-fw1 behind a VPN-Qube ("external IP through VPN"). Please change the name of your sys-VMs accordingly. 
+In order to resolve the external IP, the wget command is used and must therefore be available in the AppVM/TemplateVM.
+
 qubes-conky.conf
 ```
+[user@dom0 ~]$ cat /etc/conky/conky.conf
 conky.config = {
     alignment = 'top_right',
     background = false,
@@ -111,31 +116,38 @@ conky.config = {
 
 conky.text = [[
 ${color grey}Uptime: $color$uptime \
-${goto 225}${color grey}Fan: $color${exec sensors|grep -Eo '[0-9]+ RPM'|head -n1} \
+${goto 225}${color grey}Fan  : $color${exec sensors|grep -Eo '[0-9]+ RPM'|head -n1} \
 ${alignr 10}${color grey}Temperature: $color${acpitemp}℃ 
+${color grey}Battery: $color${exec upower -d | grep "percentage" | tail -1 | awk '{ print $2 }' } \
+${goto 225}${color grey}Drain: $color${exec upower -d | grep "energy-rate"   | tail -1 | awk '{ print $2 }'} W/h \
+${alignr 10}${color grey}Remaining: $color${exec upower -d | grep "time to empty" | head -1 | awk '{ print $4 }'} ${exec upower -d | grep "time to empty" | tail -1 | gawk '{ print $5 }'}
 ${color grey}$hr
 ${color #ffff00}CPU:${goto 55}$cpu%${goto 110}${freq} MHz\
 ${alignr 25}${color #00ff00}RAM dom0: $memperc% = $mem / $memmax
 ${color #ff3300}${goto 55}Load: ${loadavg}\
-${alignr 25}${color #00ff00}Xen: ${execp ./xenmem-conky}
+${alignr 25}${color #00ff00}Xen: ${execp /etc/conky/xenmem-conky.sh}
 ${color #88cc00}${cpugraph 60,260 00ff00 ff0000} \
 ${color #88cc00}${memgraph 60,260 00ff00 ff0000}
 ${color grey}Swap Usage: $swapperc% = $swap/$swapmax \
 ${goto 270}${color grey}${swapbar 4 00ff00 ff0000}
 ${color grey}$hr
+${color grey}sys-net: $color${exec qvm-run --auto --pass-io --no-gui sys-net 'wget -4 -q -O - icanhazip.com'} \
+${goto 270}${color grey}sys-fw1: $color${exec qvm-run --auto --pass-io --no-gui sys-fw1 'wget -4 -q -O - icanhazip.com'}
+${color grey}$hr
 ${color grey}Processes:$color $processes  \
 ${color grey}Running:$color $running_processes
 
 ${color yellow}Highest CPU${goto 140}PID${goto 220}CPU%${goto 270}|${goto 280}${color green}Highest MEM${goto 400}PID${goto 480}MEM%
-${color grey}${top name 1}${goto 140}${top pid 1}${goto 220}${top cpu 1}${goto 270}|${goto 280}${color0}${top_mem name 1}${goto 400}${top_mem pid 1}${goto 480}${top_mem mem 1}
-${color grey}${top name 2}${goto 140}${top pid 2}${goto 220}${top cpu 2}${goto 270}|${goto 280}${color0}${top_mem name 2}${goto 400}${top_mem pid 2}${goto 480}${top_mem mem 2}
-${color grey}${top name 3}${goto 140}${top pid 3}${goto 220}${top cpu 3}${goto 270}|${goto 280}${color0}${top_mem name 3}${goto 400}${top_mem pid 3}${goto 480}${top_mem mem 3}
-${color grey}${top name 4}${goto 140}${top pid 4}${goto 220}${top cpu 4}${goto 270}|${goto 280}${color0}${top_mem name 4}${goto 400}${top_mem pid 4}${goto 480}${top_mem mem 4}
-${color grey}${top name 5}${goto 140}${top pid 5}${goto 220}${top cpu 5}${goto 270}|${goto 280}${color0}${top_mem name 5}${goto 400}${top_mem pid 5}${goto 480}${top_mem mem 5}
+${color grey}${top name 1}${goto 140}${top pid 1}${goto 220}${top cpu 1}${goto 270}|${goto 280}${color grey}${top_mem name 1}${goto 400}${top_mem pid 1}${goto 480}${top_mem mem 1}
+${color grey}${top name 2}${goto 140}${top pid 2}${goto 220}${top cpu 2}${goto 270}|${goto 280}${color grey}${top_mem name 2}${goto 400}${top_mem pid 2}${goto 480}${top_mem mem 2}
+${color grey}${top name 3}${goto 140}${top pid 3}${goto 220}${top cpu 3}${goto 270}|${goto 280}${color grey}${top_mem name 3}${goto 400}${top_mem pid 3}${goto 480}${top_mem mem 3}
+${color grey}${top name 4}${goto 140}${top pid 4}${goto 220}${top cpu 4}${goto 270}|${goto 280}${color grey}${top_mem name 4}${goto 400}${top_mem pid 4}${goto 480}${top_mem mem 4}
+${color grey}${top name 5}${goto 140}${top pid 5}${goto 220}${top cpu 5}${goto 270}|${goto 280}${color grey}${top_mem name 5}${goto 400}${top_mem pid 5}${goto 480}${top_mem mem 5}
 ${color grey}$hr
 ${color grey}Qubes VM performance:
-${color grey}${execp xentop -f -b -i2 -d0 | tail -n+2 | sed -r -n '/NAME/,$ p' |  sed -r -n 's/^\s*([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+.*$/\1${goto 140}\4${goto 220}\9${goto 300}\6${goto 400}\8/p'}
+${color grey}${execp xentop -f -b -i2 -d1 | tail -n+2 | sed -r -n '/NAME/,$ p' |  sed -r -n 's/^\s*([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+.*$/\1${goto 140}\4${goto 220}\9${goto 300}\6${goto 400}\8/p'}
 ]]
+
 ```
 This will assume that the helper script (which will calculate the RAM usage from xen) is located in the same directory like qubes-conky.conf.
 If this is not the case, please adapt the config.
