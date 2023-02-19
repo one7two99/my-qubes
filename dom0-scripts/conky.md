@@ -145,7 +145,7 @@ ${color grey}${top name 4}${goto 140}${top pid 4}${goto 220}${top cpu 4}${goto 2
 ${color grey}${top name 5}${goto 140}${top pid 5}${goto 220}${top cpu 5}${goto 270}|${goto 280}${color grey}${top_mem name 5}${goto 400}${top_mem pid 5}${goto 480}${top_mem mem 5}
 ${color grey}$hr
 ${color grey}Qubes VM performance:
-${color grey}${execp xentop -f -b -i2 -d1 | tail -n+2 | sed -r -n '/NAME/,$ p' |  sed -r -n 's/^\s*([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+.*$/\1${goto 140}\4${goto 220}\9${goto 300}\6${goto 400}\8/p'}
+${color grey}${execp xentop -f -b -i2 -d5 | tail -n+2 | sed -r -n '/NAME/,$ p' |  sed -r -n 's/^\s*([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+.*$/\1${goto 140}\4${goto 220}\9${goto 300}\6${goto 400}\8/p'}
 ]]
 
 ```
