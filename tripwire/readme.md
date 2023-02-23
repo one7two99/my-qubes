@@ -12,7 +12,11 @@ The solution
 ------------
 The idea is to run a script after login which will trigger a tripwire run and present nice notification using notify-send and also present the tripwire log file, in case the Exit code is not 0.
 
-This needs the following actions:
+![notification1](https://user-images.githubusercontent.com/831382/220892524-720cb35f-c8b9-420f-b0aa-ed88dc8271d9.png)
+
+![notification2](https://user-images.githubusercontent.com/831382/220892534-ff6891d6-13c7-46c3-a35e-8856dcfa37a5.png)
+
+How does it works:
 - install tripwire in dom0 (one package)
 - configuration of tripwire
 - tripwire-autocheck script to be run on login
@@ -98,5 +102,4 @@ sudo tripwire --check
 ### Add automatation on login
 Now it's time to add the tripwire-autocheck.sh script ( https://github.com/one7two99/my-qubes/blob/master/tripwire/tripwire-autocheck.sh ) to be run after Qubes login by adding it to "Application Autostart" via Qubes Menu > System Tools > Session and Startup, Tab: Application Autostart:
 
-IMG
-
+![autostart](https://user-images.githubusercontent.com/831382/220892375-6d2aa628-3a61-4fa4-8b72-d1f5e3540536.png)
