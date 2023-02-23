@@ -3,6 +3,7 @@ A simple conky configuration for dom0
 Conky is a well know tool to display monitoring variables on the desktop and can adopted in many (!) ways.
 
 My current conky setup, showing overall RAM utilization, state of running Qubes, External and VPN IPs, status of Pihole DNS blocks and more:
+
 ![conky](https://user-images.githubusercontent.com/831382/220893084-68f96c69-2115-483a-b468-d420a2fac329.png)
 
 A good impression what can be done with conky can be found here;
