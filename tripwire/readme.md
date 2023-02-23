@@ -8,10 +8,21 @@ If you're interested in using Coreboot on the X230 you find my howto at https://
 
 In order to be at least protected against changes to the unencrypted /boot partition I was using a simple script comparing checksums but have now moved to use tripwire.
 
-Benefits
---------
-- tripwire is available in an open source version
-- tripwire will only install one package in dom0
+The solution
+------------
+The idea is to run a script after login which will trigger a tripwire run and present nice notification using notify-send and also present the tripwire log file, in case the Exit code is not 0.
+
+This needs the following actions:
+- install tripwire in dom0 (one package)
+- configuration of tripwire
+- tripwire-autocheck script to be run on login
+
+The following guide will describe all actions.
+
+DISCLAIMER:
+Please review my scripts so that you fully understand what the script is doing and also get a basic understanding of tripwire BEFORE you install/change anything in dom0 (as it should also be the case :-)
+
+If you have any further questions or ideas for improvements, use the Github Issues feature above.
 
 Installation in dom0
 -------------------
@@ -89,4 +100,3 @@ Now it's time to add the tripwire-autocheck.sh script ( https://github.com/one7t
 
 IMG
 
-If you have any further questions or ideas for improvements, use the Github Issues feature above.
