@@ -1,9 +1,10 @@
 A simple conky configuration for dom0
 =====================================
-
-![IMG_20230128_212336_022](https://user-images.githubusercontent.com/831382/215289219-987338a2-9630-45f0-ac1c-c8245095d99a.jpg)
-
 Conky is a well know tool to display monitoring variables on the desktop and can adopted in many (!) ways.
+
+My current conky setup, showing overall RAM utilization, state of running Qubes, External and VPN IPs, status of Pihole DNS blocks and more:
+![conky](https://user-images.githubusercontent.com/831382/220893084-68f96c69-2115-483a-b468-d420a2fac329.png)
+
 A good impression what can be done with conky can be found here;
 
 Top 15 Best Conky Themes for Linux Desktop Available Right Now
@@ -31,7 +32,9 @@ Attention:
 This conky configuration will also show the external IP adress of sys-net ("real external IP") and the external IP of my firewall sys-fw1 behind a VPN-Qube ("external IP through VPN"). Please change the name of your sys-VMs accordingly. 
 In order to resolve the external IP, the wget command is used and must therefore be available in the AppVM/TemplateVM.
 
-qubes-conky.conf
+### qubes-conky.conf
+keep in mind, that you might need to replace the names of specific VMs in order to get the desired results.
+(in my case: sys-net/sys-fw1/sys-fw2/sys-pihole1)
 ```
 [user@dom0 ~]$ cat /etc/conky/conky.conf
 conky.config = {
@@ -108,17 +111,18 @@ conky.config = {
 	--top_name_verbose = true,
 	--top_name_width = 15,
 	--total_run_times = 0,
-    update_interval = 10,
-    update_interval_on_battery = 30,
+    update_interval = 30,
+    update_interval_on_battery = 60,
     use_spacer = 'none',
     use_xft = true,
 }
+
 
 conky.text = [[
 ${color grey}Uptime: $color$uptime \
 ${goto 225}${color grey}Fan  : $color${exec sensors|grep -Eo '[0-9]+ RPM'|head -n1} \
 ${alignr 10}${color grey}Temperature: $color${acpitemp}℃ 
-${color grey}Battery: $color${exec upower -d | grep "percentage" | tail -1 | awk '{ print $2 }' } \
+${color grey}Battery: $color${exec upower -d | grep "percentage" | tail -1 | awk '{ print $2 }' | grep -o '[0-9]*\.[0-9]' }% \
 ${goto 225}${color grey}Drain: $color${exec upower -d | grep "energy-rate"   | tail -1 | awk '{ print $2 }'} W/h \
 ${alignr 10}${color grey}Remaining: $color${exec upower -d | grep "time to empty" | head -1 | awk '{ print $4 }'} ${exec upower -d | grep "time to empty" | tail -1 | gawk '{ print $5 }'}
 ${color grey}$hr
@@ -131,8 +135,11 @@ ${color #88cc00}${memgraph 60,260 00ff00 ff0000}
 ${color grey}Swap Usage: $swapperc% = $swap/$swapmax \
 ${goto 270}${color grey}${swapbar 4 00ff00 ff0000}
 ${color grey}$hr
-${color grey}sys-net: $color${exec qvm-run --auto --pass-io --no-gui sys-net 'wget -4 -q -O - icanhazip.com'} \
-${goto 270}${color grey}sys-fw1: $color${exec qvm-run --auto --pass-io --no-gui sys-fw1 'wget -4 -q -O - icanhazip.com'}
+${color grey}sys-net: $color${exec qvm-run --auto --pass-io --no-gui sys-net 'wget -4 -q -O - https://ipv4.icanhazip.com'} \
+${alignr 10}${color grey}sys-fw1 (VPN): $color${exec qvm-run --auto --pass-io --no-gui sys-fw1 'wget -4 -q -O - https://ipv4.icanhazip.com'}
+${color grey}DNS Queries: $color${exec qvm-run --pass-io sys-pihole1 'echo ">stats >quit" | nc localhost 4711' | grep dns_queries_today | gawk '{ print $2 }'} \
+${goto 225}${color grey}Blocked: $color${exec qvm-run --pass-io sys-pihole1 'echo ">stats >quit" | nc localhost 4711' | grep ads_blocked_today | gawk '{ print $2 }'} \
+${alignr 10}${color grey}Percentage: $color${exec qvm-run --pass-io sys-pihole1 'echo ">stats >quit" | nc localhost 4711' | grep ads_percentage_today | gawk '{ print $2 }' | grep -o '[0-9]*\.[0-9]'}%
 ${color grey}$hr
 ${color grey}Processes:$color $processes  \
 ${color grey}Running:$color $running_processes
@@ -146,8 +153,8 @@ ${color grey}${top name 5}${goto 140}${top pid 5}${goto 220}${top cpu 5}${goto 2
 ${color grey}$hr
 ${color grey}Qubes VM performance:
 ${color grey}${execp xentop -f -b -i2 -d5 | tail -n+2 | sed -r -n '/NAME/,$ p' |  sed -r -n 's/^\s*([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+([^ ]+)\s+.*$/\1${goto 140}\4${goto 220}\9${goto 300}\6${goto 400}\8/p'}
-]]
 
+]]
 ```
 This will assume that the helper script (which will calculate the RAM usage from xen) is located in the same directory like qubes-conky.conf.
 If this is not the case, please adapt the config.
