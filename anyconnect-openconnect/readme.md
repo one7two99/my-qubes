@@ -7,6 +7,7 @@ How to use openconnect to connect to an AnyConnect VPN with Qubes OS
 # Purpose : Script to autoconnect to a Cisco Anyconnect VPN using openconnect
 # Version : v0.1 - draft
 # Author  : One7two99
+# Link    : https://github.com/one7two99/my-qubes/blob/master/anyconnect-openconnect/
 # Install : As root (qvm-run -a -u root APPVM
 #           1) mkdir -p /rw/config/openconnect
 #           2) Store this script, userpassword.txt and openconnect.conf in /rw/config/openvpn
