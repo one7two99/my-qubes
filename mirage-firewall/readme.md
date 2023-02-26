@@ -27,6 +27,9 @@ qvm-run --auto --pass-io anon-whonix \
 
 Use the issue tab to ask or leave comments.
 
+There is one more thing ...
+... Did I mention that you should always review any script a random guy at github is offering you to be run in dom0 ;-) ?
+
 ```
 #!/bin/bash
 # Script to download and install qubes-mirage-firewall
