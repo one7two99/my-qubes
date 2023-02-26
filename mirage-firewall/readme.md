@@ -17,7 +17,7 @@ Hints:
 
 - wget ... is used to download the file in anon-whonix
 - ```--quiet``` ... will surpress any status messages when using the wget command
-- ```--output-document -``` ... will output the document to StdOut and this will be send to dom0 via --pass-io.
+- ```--output-document -``` ... will output the document to StdOut and this will be send to dom0 via --pass-io and then saved into a document qubes-mirage-firewall_readme.md
 
 ```
 qvm-run --auto --pass-io anon-whonix \
