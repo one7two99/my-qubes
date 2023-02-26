@@ -1,5 +1,5 @@
-How use openconnect to connect to an AnyConnect VPN with Qubes
-==============================================================
+How to use openconnect to connect to an AnyConnect VPN with Qubes OS
+====================================================================
 
 ```
 #!/bin/bash
