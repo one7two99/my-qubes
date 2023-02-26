@@ -13,6 +13,14 @@ To download and install the qubes-mirage firewall, run the following action from
 It will download the binary file and create a mirage-firewall qube, which you can use as NetVM for AppVMs or other NetVMs.
 
 To download this text/the script to your dom0 you can run the following command from dom0:
+Hints:
+wget is used to download the file in anon-whonix
+--quiet
+will surpress any status messages when using the wget command
+
+--output-document -
+... will output the document to StdOut and this will be send to dom0 via --pass-io.
+
 ```
 qvm-run --auto --pass-io anon-whonix \
 "wget --quiet --output-document - https://raw.githubusercontent.com/one7two99/my-qubes/master/mirage-firewall/readme.md" \
