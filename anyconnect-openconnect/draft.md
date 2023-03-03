@@ -62,3 +62,8 @@ echo $(pass show DOEINC/JOHNDOE) |  openconnect \
         $VpnServer
 ```
 
+To disconnect openconnect VPN
+```
+sudo pkill --signal SIGINT openconnect
+```
+
