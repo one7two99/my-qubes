@@ -75,4 +75,5 @@ for DNS in $vpn_dns; do
 done
 
 # Send a notification
-echo \'"sleep 2; notify-send \"$hostname: Connected via openconnect.\""\' | xargs su - user -c &```
+echo \'"sleep 2; notify-send \"$hostname: Connected via openconnect.\""\' | xargs su - user -c &
+```
