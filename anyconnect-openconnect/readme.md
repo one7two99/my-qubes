@@ -26,7 +26,7 @@ How to use openconnect to connect to an AnyConnect VPN with Qubes OS
 # servercert pin-sha256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=
 # port 1194
 
-### Connect via anydesk using openconnect
+### Connect via anyconnect using openconnect
 # Use some variables
 hostname=$(hostname)
 ConfigDir=/rw/config/openconnect
