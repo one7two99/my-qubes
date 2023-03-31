@@ -1,10 +1,12 @@
  Template for general a productivity VM
 =======================================
 
+Last updated 03/31/2023
+
 ## fedora based general AppVM
 ```
-Template=fedora-35-minimal
-TemplateName=t_fedora-35-apps
+Template=fedora-37-minimal
+TemplateName=t_fedora-37-apps_v1
 
 qvm-kill $TemplateName
 qvm-remove --force $TemplateName
@@ -14,7 +16,6 @@ qvm-clone $Template $TemplateName
 qvm-run --auto --pass-io --no-gui --user root $TemplateName 'dnf install -y \
 	qubes-core-agent-networking \
 	qubes-usb-proxy \
-	pulseaudio-qubes \
 	qubes-gpg-split \
 	qubes-mgmt-salt-vm-connector \
 	zenity \
@@ -26,17 +27,21 @@ qvm-run --auto --pass-io --no-gui --user root $TemplateName 'dnf install -y \
 	firefox \
 	nautilus \
 	qubes-core-agent-nautilus \
-	nautilus-search-tool \
 	evince \
-	evince-nautilus \
 	pinentry-gtk \
 	unzip \
 	nano \
+	emacs \
 	git \
 	mc \
 	less \
 	wget \
-	borgbackup'
+	borgbackup \
+	restic'
+
+# Not installed:
+#	nautilus-search-tool \
+#	pulseaudio-qubes \
 ```
 
 ### Problem installing qubes-pulseaudio under fedora-36
@@ -46,9 +51,9 @@ qvm-run --auto --pass-io --no-gui --user root $TemplateName 'dnf install -y \
 ```
 
 ### Set this template as Template for a disposable VM
-Create a new Disposable App-VM which is based on a custom template t-fedora-2
+Create a new Disposable App-VM which is based on a custom template
 ```
-template4dvm=t_fedora-35-apps
+template4dvm=t_fedora-37-apps_v1
 newdvmtemplatename=my-dvm
 qvm-create --template $template4dvm --label red --property template_for_dispvms=True --class=AppVM $newdvmtemplatename
 ```
