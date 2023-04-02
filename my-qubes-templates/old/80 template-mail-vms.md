@@ -1,8 +1,6 @@
-==================
- t-fedora-33-mail -> ok
-==================
-
---- 8< ---
+ t-fedora-37-mail
+=================
+```
 Template=fedora-33-minimal
 TemplateName=t-fedora-33-mail
 qvm-kill $TemplateName
@@ -13,32 +11,32 @@ qvm-run --auto --pass-io --no-gui --user root $TemplateName \
   'dnf -y update'
 
 qvm-run --auto --pass-io --no-gui --user root $TemplateName \
-  'dnf install -y qubes-usb-proxy nano \
-  qubes-gpg-split qubes-core-agent-networking dnf-plugins-core polkit pinentry-gtk \
-  thunderbird thunderbird-qubes thunderbird-enigmail dns-utils'
+  'dnf install -y  nano git \
+  qubes-usb-proxy qubes-gpg-split qubes-core-agent-networking \
+  pinentry-gtk dnsutils iptraf-ng nano git zenity \
+  thunderbird thunderbird-qubes'
 
+# installed before in fedora-36 based template: dnf-plugins-core polkit 
+
+# Install Protonmail Bridge
+# Download ProtonBridge in a disposable VM
+# https://proton.me/mail/bridge#download and choose the .rpm-package
+# Copy rpm-package from disposable VM to the mail-template VM
+qvm-run --auto --pass-io --no-gui --user root $TemplateName \
+  'dnf install -y /home/user/QubesIncoming/*/protonmail-bridge*.rpm'
 
 qvm-shutdown $TemplateName 
 
-qvm-create --template=$TemplateName --label=blue my-privmail
+# Create your mail AppVM
+MailAppVM=my-mail
+qvm-create --template=$TemplateName --label=blue $MailAppVM
 
-### in AppVM > Thunderbird
-Download Hide Local Folders
-
-================
-t_debian-11-mail
-================
-
-Download ProtonBridge in a disposable VM
-https://proton.me/mail/bridge#download
-Choose the linux .deb package
-Copy .deb package to your mail template VM
-Switch to the QubesIncoming in your template VM folder where the .deb package has been copied.
-Install via: dpkg -i ./protonmail-bridge*.deb
-
-
-
-ProtonBridge v2.1.3 --> 2.2.1
-
-
-
+# Allow only communication to Protonmail-Servers
+qvm-firewall $MailAppVM reset
+qvm-firewall $MailAppVM del --rule-no 0
+ProtonmailIPs="185.70.42.12 185.70.42.25"
+for IP in $ProtonmailIPs
+do
+   qvm-firewall $MailAppVM add action=accept proto=tcp dsthost=$IP/32 dstports=443 comment="Allow ProtonmailBridge"
+done
+qvm-firewall $MailAppVM add action=drop comment="Drop everything else"
