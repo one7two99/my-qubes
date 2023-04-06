@@ -1,5 +1,37 @@
- t-fedora-37-mail
+t_debian-11-mail_v1
+===================
+
+```
+Template=debian-11-minimal
+TemplateName=t_debian-11-mail_v1
+qvm-clone $Template $TemplateName 
+qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt get update'
+qvm-run --auto --pass-io --no-gui --user root $TemplateName 'dpkg-reconfigure locales'
+qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt-get upgrade'
+qvm-run --auto --pass-io --no-gui --user root $TemplateName \
+   'apt-get install nano git qubes-usb-proxy qubes-gpg-split \
+    qubes-core-agent-networking pinentry-gtk dnsutils iptraf-ng \
+    zenity thunderbird thunderbird-qubes'
+qvm-run --auto --pass-io --no-gui --user root $TemplateName \
+   'apt-get install nano git qubes-usb-proxy qubes-gpg-split \
+    qubes-core-agent-networking  dnsutils iptraf-ng zenity \
+    thunderbird thunderbird-qubes'
+    
+# Download ProtonmailBridge and copy it to the TemplateVM
+qvm-run --auto --pass-io --no-gui --user root $TemplateName 'dpkg -i /home/user/QubesIncoming/*/protonmail-bridge*.deb'
+qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt --fix-broken install'
+qvm-run --auto --pass-io --no-gui --user root $TemplateName 'dpkg -i /home/user/QubesIncoming/*/protonmail-bridge*.deb'
+qvm-shutdown $TemplateName 
+MailAppVM=my-mail
+qvm-create --template=$TemplateName --label=blue $MailAppVM 
+
+```
+
+
+t-fedora-37-mail
 =================
+
+Running ProtonmailBridge in an AppVm based on fedora didn't work, therefore I used a debian based template (as stated above)
 ```
 Template=fedora-33-minimal
 TemplateName=t-fedora-33-mail
