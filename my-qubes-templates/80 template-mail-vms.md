@@ -1,6 +1,7 @@
 t_debian-11-mail_v1
 ===================
 
+Unfortunately ProtonmailBridge seems to be broken in the latest version as it is not possible to start the application in the AppVM - need to clarify the root cause.
 ```
 Template=debian-11-minimal
 TemplateName=t_debian-11-mail_v1
@@ -31,7 +32,7 @@ qvm-create --template=$TemplateName --label=blue $MailAppVM
 t-fedora-37-mail
 =================
 
-Running ProtonmailBridge in an AppVm based on fedora didn't work, therefore I used a debian based template (as stated above)
+Unfortunately ProtonmailBridge seems to be broken in the latest version as it is not possible to start the application in the AppVM - need to clarify the root cause.
 ```
 Template=fedora-33-minimal
 TemplateName=t-fedora-33-mail
