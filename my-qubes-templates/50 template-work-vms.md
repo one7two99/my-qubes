@@ -28,6 +28,7 @@ qvm-run --auto --user root --pass-io --no-gui $worktemplatevm \
 		mc \
 		less \
 		unzip \
+		openssl \
 		pinentry-gtk \
 		qubes-gpg-split \
 		qubes-core-agent-networking \
@@ -134,7 +135,7 @@ The certificate has to be installed in the template!
 
 ```
 netvm=sys-net
-worktemplatevm=t_fedora-37_work_v1
+worktemplatevm=t_fedora-37-work_v1
 
 #The easiest way is to give your template VM a short connection to the internet.
 qvm-prefs $worktemplatevm netvm $netvm
