@@ -126,3 +126,34 @@ qvm-service --enable $WorkAppVM network-manager
 # Network Manager Icon > VPN Connections > Configure VPN
 # Add > Cisco AnyConnect Compatible VPN (openconnect)
 ```
+
+Import a Root CA Certificate
+----------------------------
+This is how you can add your own Root CA to be able to verify certificates.
+The certificate has to be installed in the template!
+
+```
+netvm=sys-net
+worktemplatevm=t_fedora-37_work_v1
+
+#The easiest way is to give your template VM a short connection to the internet.
+qvm-prefs $worktemplatevm netvm $netvm
+
+qvm-run --auto --pass-io --no-gui --user root $worktemplatevm \
+   'servername=EXAMPLE.COM && \
+    caname=COMPANY-CA && \
+    echo -n | openssl s_client -connect $servername:443 -showcerts > $caname.crt'
+```
+edit this file to only leave the (last=) CA part of the certficiate including the --BEGIN and --END.
+Convert it from CRT to PEM and move it to the credentials store and finally update CA trust store:
+```
+qvm-run --auto --pass-io --no-gui --user root $worktemplatevm \
+   'nano $caname.crt && \
+    openssl x509 -in $caname.crt -out $caname.pem -outform PEM && \
+    mv $caname.pem /etc/pki/ca-trust/source/anchors && \
+    update-ca-trust'
+```
+Remove NetVM from template and shutdown template
+```
+qvm-prefs $worktemplatevm netvm ''
+qvm-shutdown --wait $worktemplatevm 
