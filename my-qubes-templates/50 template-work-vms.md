@@ -1,4 +1,4 @@
-t_fedora-34-work_v1
+t_fedora-37-work_v1
 ===================
 ```
 basetemplate=fedora-37-minimal
@@ -93,6 +93,11 @@ qvm-run --auto --pass-io --no-gui --user root $worktemplatevm \
 		NetworkManager-vpnc-gnome \
 		NetworkManager-openvpn-gnome \
 		NetworkManager-openvpn'
+
+# See also: https://gitlab.com/openconnect/openconnect/-/issues/326
+qvm-run --auto --pass-io --no-gui --user root $worktemplatevm \
+	'update-crypto-policies --set DEFAULT:FEDORA32 && \
+	 rpm -qa | grep crypto-poli'
 
 
 qvm-shutdown --wait $worktemplatevm 
