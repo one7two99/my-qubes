@@ -154,7 +154,8 @@ qvm-run --auto --pass-io --no-gui --user root $worktemplatevm "xterm"
 qvm-run --auto --pass-io --no-gui --user root $worktemplatevm "xterm"
     openssl x509 -in $caname.crt -out $caname.pem -outform PEM"
 qvm-run --auto --pass-io --no-gui --user root $worktemplatevm \
-   'mv $caname.pem /etc/pki/ca-trust/source/anchors && \
+   'mkdir -p etc/pki/ca-trust/source/anchors && \
+    mv $caname.pem /etc/pki/ca-trust/source/anchors && \
     update-ca-trust'
 ```
 Remove NetVM from template and shutdown template
