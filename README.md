@@ -6,7 +6,7 @@
  - \my-qubes-templates - howtos regarding the setup of my qubes installation 
 
 # Download this repository
-To download this repository in dom0 to make use of all teh qvm-run commands in the my-qubes-templates folder
+To download this repository in dom0 to make use of all the qvm-run commands in the my-qubes-templates folder
 
 ```
 # Change the my-untrusted to the AppVM from which you want to download the repository
