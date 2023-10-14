@@ -1,8 +1,14 @@
 Howto setup a sys template based on Debian 12 minimal
 =====================================================
+
+This howto will explain how to build a template whoch can be used for sys-net, sys-usb, sys-firewall.
+Instead of using a "full" template this template will be bases on a debian-12-minimal templates which will have a smaller ressource footprint than the default template.
+Additionally the template can also be used for a sys-vpn for VPN providers which use OpenVPN or Wireguard.
+It has been tested successfully with ProtonVPN using OpenVPN and MullvadVPN using Wireguard.
+
 ```
 template=debian-12-minimal
-systemplate=t_debian-12-sys_v2
+systemplate=t_debian-12-sys_v1
 
 #clone template
 qvm-clone $template $systemplate
@@ -71,6 +77,8 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
         yubikey-personalization'
 ```
 
+--- EVERYTHING FOR HERE NEEDS TO BE UPDATED TO REFLECT LATEST CHANGES ---
+
 Disposable Sys-VMs
 ==================
 See also: https://qubes-os.org/doc/disposable-customization
@@ -78,7 +86,7 @@ See also: https://qubes-os.org/doc/disposable-customization
 Prepare disposable AppVM as template for (named) disposable sys-VMs
 -------------------------------------------------------------------
 ```
-sys_template=t_debian-11-sys
+sys_template=t_debian-12-sys_v1
 dvm_sys_template=sys-dvm
 
 # create a disposable template for the sys-vms
@@ -110,7 +118,8 @@ qvm-features $netvm appmenus-dispvm ''
 qvm-pci | grep Network && qvm-pci | grep Ethernet
 
 # add Network controllers to sys-net-dvm
-# maybe you need to add: -o no-strict-reset=True
+# maybe you need to add: -o no-strict-reset=True if sys-net doesn't boot
+# Make sure to change the hardware identifiers to the one from your system
 qvm-pci attach --persistent -o no-strict-reset=True $netvm dom0:02_00.0 
 qvm-pci attach --persistent -o no-strict-reset=True $netvm dom0:00_19.0 
 
@@ -121,6 +130,8 @@ qvm-pci attach --persistent -o no-strict-reset=True $netvm dom0:00_19.0
 nano /etc/qubes-rpc/policy/qubes.UpdatesProxy
 
 # mount WWAN always
+qvm-start sys-usb
+qvm-
 qvm-usb attach sys-net sys-usb:2-3 --persistent
 
 ```
