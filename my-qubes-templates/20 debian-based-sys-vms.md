@@ -1,24 +1,17 @@
-Debian based minimal sys-vms (including disposable)
-===================================================
-2022/11/10
-
-Howto setup a sys template based on Debian 11
-
+Howto setup a sys template based on Debian 12 minimal
+=====================================================
 ```
-template=debian-11-minimal
-systemplate=t_debian-11-sys
+template=debian-12-minimal
+systemplate=t_debian-12-sys_v2
 
 #clone template
 qvm-clone $template $systemplate
 
 # Conigure locales
 qvm-run --auto --user root --pass-io --no-gui $systemplate 'dpkg-reconfigure locales'
-# install the following locales:  110,111,112,158
-# 110. de_DE ISO-8859-1
-# 111. de_DE.UTF-8 UTF-8
-# 112. de_DE@euro ISO-8859-15 
-# 158. en_US.UTF-8 UTF-8
-# Choose the following default locale: 6. en_US.UTF-8
+# install the following locales: 72,97
+# 72 = de_DE.UTF-8
+# 97 = en_US.UTF-
 
 # update template
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
@@ -26,78 +19,58 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
 
 # for sys-vms without gnome network manager & drivers (sys-usb / sys-firewall)
 # zenity - for file selection dialogs in dom0 (ex: Qubes Backup)
-# dunst - nice notifications (requires libnotify-bin
-# net-tools, iptraf, wget- useful for analysis in NetVMs
+# xfce4-notifyd for popup notifications (or use: dunst + libnotify-bin)
 
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'apt-get install \
-	qubes-core-agent-networking \ 
-	qubes-menus \
-	qubes-mgmt-salt-vm-connector \
-	qubes-core-agent-dom0-updates \
-	qubes-usb-proxy \
-	qubes-input-proxy-sender \
-	dunst libnotify-bin \
-	git \
-	net-tools iptraf wget'
+        qubes-core-agent-networking \
+        qubes-menus \
+        qubes-mgmt-salt-vm-connector \
+        qubes-core-agent-dom0-updates \
+        qubes-usb-proxy \
+        qubes-input-proxy-sender \
+        xfce4-notifyd \
+        net-tools \
+	curl'
 
 # for sys-vms with gnome network-manager & drivers (sys-net)
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'apt-get install \
-	network-manager \
-	qubes-core-agent-network-manager \
-	firmware-iwlwifi \
-	modem-manager-gui \
-	qubes-usb-proxy'
+        network-manager \
+        qubes-core-agent-network-manager \
+        firmware-iwlwifi \
+        modem-manager-gui '
 
-# for openvpn-support
+# for vpn-support
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'apt-get install \
-	openvpn'
+        openvpn wireguard wireguard-tools resolvconf'
 
-# to use NetworkManager with VPN
+# shutdown the template
+qvm-shutdown --wait systemplate
+
+#--- optional stuff, you might want in your sys-xxx templates
+
+# NOT NEEDED, only usefull for troubleshooting/analysis net-tools, iptraf, wget
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'apt-get install \
-	network-manager-openconnect \
-	network-manager-openconnect-gnome \
-	network-manager-openvpn \
-	network-manager-openvpn-gnome'
+        iptraf wget git'
 
-# for yubikey-support for login or lockscreen
-# you need to install in dom0: qubes-yubikey-dom0
+# NOT NEEDED, only if you want to use NetworkManager with VPN
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'apt-get install \
-	yubikey-personalization'
+        network-manager-openconnect \
+        network-manager-openconnect-gnome \
+        network-manager-openvpn \
+        network-manager-openvpn-gnome'
 
-# Notification daemons, two options (I prefer dunst which I install therefore above)
-# 1) dunst libnotify-bin - minimal notification daemon (only two packages)
-# 2) xfce4-notifyd - default notification daemon,
-#    this will install the following packages as dependencies:
-#	adwaita-icon-theme at-spi2-core glib-networking glib-networking-common
-#	glib-networking-services gsettings-desktop-schemas gtk-update-icon-cache
-# 	libatk-bridge2.0-0 libatk1.0-0 libatk1.0-data libatspi2.0-0 libavahi-client3
-#  	libavahi-common-data libavahi-common3 libcolord2 libcups2 libgtk-3-0
-#  	libgtk-3-bin libgtk-3-common libjson-glib-1.0-0 libjson-glib-1.0-common
-#  	libnotify-bin libproxy1v5 librest-0.7-0 librsvg2-common libsoup-gnome2.4-1
-#  	libsoup2.4-1 libstartup-notification0 libwayland-cursor0 libwayland-egl1
-#  	libxcb-util1 libxfce4panel-2.0-4 libxfce4ui-2-0 libxfce4ui-common
-#  	libxfce4util-bin libxfce4util-common libxfce4util7 libxfconf-0-3
-#  	libxkbcommon0 libxtst6 xfconf
-
-
-### LEGACY Start --- 8< --- --- --- 
-## packages installed in the past, not needed anymore (?)
-#	pciutils usbutils iputils 
-#	tar less psmisc nano unzip iproute \
-#	qubes-gpg-split notification-daemon locales locales-all \
-#	tcpdump telnet nmap nmap-ncat \
-#	dbus-x11 polkit @hardware-support
-#	wireless-tools \
-#	usb-modeswitch \
-### LEGACY End --- 8< --- --- --- 
-
-
+# NOT NEEDED, only for for yubikey-support for login or lockscreen
+# you also need to install in dom0: qubes-yubikey-dom0
+qvm-run --auto --user root --pass-io --no-gui $systemplate \
+  'apt-get install \
+        yubikey-personalization'
 ```
+
 Disposable Sys-VMs
 ==================
 See also: https://qubes-os.org/doc/disposable-customization
