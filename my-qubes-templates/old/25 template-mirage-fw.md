@@ -1,70 +1,48 @@
 Mirage unikernel firewall
 =========================
-These commands will setup a build-VM to build the mirage kernel, build the kernel, copy it to domß and will also create the mirage unikernel firewall itself.
-
-See also: https://github.com/mirage/qubes-mirage-firewall
-
-Status: not (yet) working
-Date: 17.10.21 with Qubes 4.1rc1
-Problem: the mirage firewall will start, but will halt after a few seconds. Still looking for the root cause.
-
 ```
-### Naming of variables
-TemplateVM=fedora-34
-MirageFWBuildVM=fedora-34-miragebuildvm
-MirageFWAppVM=sys-mirage-fw
-MyNetVM=sys-firewall
+#!/bin/bash
+# Script to download and install qubes-mirage-firewall
+# Adapt variables to latest version and your needs
+# Check GitHub Project Page:
+#   https://github.com/mirage/qubes-mirage-firewall
 
-### create a temporary BuildVM to build the mirage kernel
-qvm-create $MirageFWBuildVM --class=StandaloneVM --label=red --template=$TemplateVM
-qvm-volume resize $MirageFWBuildVM:private 10GB
-qvm-prefs --set $MirageFWBuildVM netvm $MyNetVM    
+# Some variables
+Release=v0.8.4
+DownloadVM=anon-whonix
+MirageFW=sys-mirage-fw
 
-### prequisitis to add the docker repository
-qvm-run --auto --pass-io --no-gui $MirageFWBuildVM \
-    'mkdir /home/user/docker'
+GithubUrl=https://github.com/mirage/qubes-mirage-firewall
+Filename=mirage-firewall.tar.bz2
+DownloadBinary=$GithubUrl/releases/download/$Release/$Filename
+MirageInstallDir=/var/lib/qubes/vm-kernels/mirage-firewall
 
-qvm-run --auto --pass-io --no-gui --user=root $MirageFWBuildVM \
-     'ln -s /home/user/docker /var/lib/docker && \
-      qvm-sync-clock && dnf -y upgrade && dnf -y install docker git && \
-      systemctl start docker'
+# Download and unpack in DownloadVM
+qvm-run -a --pass-io --no-gui $DownloadVM "wget $DownloadBinary"
+qvm-run -a --pass-io --no-gui $DownloadVM "tar -xvjf $Filename"
 
-qvm-run --auto --pass-io --no-gui $MirageFWBuildVM \
-    'git clone https://github.com/mirage/qubes-mirage-firewall.git && \
-     cd qubes-mirage-firewall && \
-     git pull origin pull/52/head'
+# Install mirage kernel
+mkdir -p $MirageInstallDir
+cd $MirageInstallDir
+qvm-run --pass-io --no-gui $DownloadVM "cat mirage-firewall/vmlinuz" > vmlinuz
+gzip -n9 < /dev/null > initramfs
 
-qvm-run --auto --pass-io --no-gui --user=root $MirageFWBuildVM \
-     'cd /home/user/qubes-mirage-firewall && \
-     ./build-with-docker.sh'
+# Create sys-mirage-fw
+qvm-create \
+  --property kernel=mirage-firewall \
+  --property kernelopts='' \
+  --property memory=32 \
+  --property maxmem=32 \
+  --property netvm=sys-net \
+  --property provides_network=True \
+  --property vcpus=1 \
+  --property virt_mode=pvh \
+  --label=gray \
+  --class StandaloneVM \
+  $MirageFW
+qvm-features $MirageFW qubes-firewall 1
+qvm-features $MirageFW no-default-kernelopts 1
 
-### copy mirage unikernel to dom0
-cd /var/lib/qubes/vm-kernels
-qvm-run --pass-io $MirageFWBuildVM 'cat qubes-mirage-firewall/mirage-firewall.tar.bz2' | tar xjf -
-
-### create a dummy file required for qubes
-gzip -n9 < /dev/null > /var/lib/qubes/vm-kernels/mirage-firewall/initramfs
-
-### create new sys-mirage-fw
-qvm-create $MirageFWAppVM \
-   --property kernel=mirage-firewall \
-   --property kernelopts='' \
-   --property memory=64 \
-   --property maxmem=64 \
-   --property netvm=sys-vpn \
-   --property provides_network=True \
-   --property vcpus=1 \
-   --property virt_mode=pvh \
-   --label=red \
-   --class StandaloneVM
-qvm-features $MirageFWAppVM qubes-firewall 1
-qvm-features $MirageFWAppVM no-default-kernelopts 1
-
-### set mirage as default NetVM
-qubes-prefs --set default_netvm $MirageFWAppVM
-
-### Remove the buildvm
-qvm-shutdown -f $MirageFWBuildVM
-qvm-remove -f $MirageFWBuildVM
-
+# Cleanup in DownloadVM
+qvm-run -a --pass-io --no-gui $DownloadVM "rm $Filename; rm -R ~/mirage-firewall"
 ```
