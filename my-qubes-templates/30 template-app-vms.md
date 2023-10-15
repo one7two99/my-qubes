@@ -1,5 +1,5 @@
- Template for general a productivity VM
-=======================================
+Template for general a productivity VM
+======================================
 
 Last updated 03/31/2023
 
@@ -37,7 +37,8 @@ qvm-run --auto --pass-io --no-gui --user root $TemplateName 'dnf install -y \
 	less \
 	wget \
 	borgbackup \
-	restic'
+	restic \
+	curl'
 
 # Not installed:
 #	nautilus-search-tool \
@@ -65,15 +66,24 @@ Fix menu entry from Domain: my-dvm to Disposable: my-dvm
 qvm-features $newdvmtemplatename appmenus-dispvm 1
 qvm-sync-appmenus --regenerate-only $newdvmtemplatename
 ```
-
-## debian based general AppVM
+## debian 12 based general AppVM
 ```
-Template=debian-10-minimal
-TemplateName=t-debian-10-apps
+Template=debian-12-minimal
+TemplateName=t-debian-12-apps_v1
 
 qvm-kill $TemplateName
 qvm-remove --force $TemplateName
 qvm-clone $Template $TemplateName
+
+# Conigure locales
+qvm-run --auto --user root --pass-io --no-gui $TemplateName 'sudo apt-get install dialog'
+
+# Conigure locales
+qvm-run --auto --user root --pass-io --no-gui $TemplateName 'dpkg-reconfigure locales'
+# install the following locales: 72,97
+# 72 = de_DE.UTF-8
+# 97 = en_US.UTF-8 <- set this as default !
+
 qvm-run --auto --pass-io --no-gui --user root $TemplateName \
   'apt-get update && apt-get -y upgrade'
 
@@ -81,21 +91,16 @@ qvm-run --auto --pass-io --no-gui --user root $TemplateName \
   'apt-get install -y keepass2 klavaro libreoffice gedit gimp \
   firefox-esr qubes-usb-proxy pulseaudio-qubes nano git mc evince \
   less qubes-gpg-split qubes-core-agent unzip \
-  nautilus wget qubes-core-agent-nautilus evince pinentry-gtk2 borgbackup'
-```
-additional apps which might be useful in a general AppVM template
-```
+  nautilus wget qubes-core-agent-nautilus evince pinentry-gtk2 borgbackup qubes-core-agent-networking'
+
+# additional apps which might be useful in a general AppVM template
 qvm-run --auto --pass-io --no-gui --user root $TemplateName \
   'dnf install -y emacs transmission transmission-cli \
   gnome-terminal-nautilus polkit e2fsprogs gnome-terminal \
   terminus-fonts dejavu-sans-fonts dejavu-sans-mono-fonts xclip'
-```
 
-## Shutdown
-```
 qvm-shutdown --wait $TemplateName
 ```
-
 ## Further usefull commands to setup defaults
 
 ### Set DVM-template as default DispVM for AppVMs
