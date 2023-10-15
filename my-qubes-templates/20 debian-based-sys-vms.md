@@ -35,6 +35,7 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
         qubes-core-agent-dom0-updates \
         qubes-usb-proxy \
         qubes-input-proxy-sender \
+        pulseaudio-qubes \
         xfce4-notifyd \
         net-tools \
 	curl'
