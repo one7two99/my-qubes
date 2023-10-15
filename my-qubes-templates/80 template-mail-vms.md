@@ -1,64 +1,57 @@
-t_debian-11-mail_v1
+t_debian-12-mail_v1
 ===================
-
-Unfortunately ProtonmailBridge seems to be broken in the latest version as it is not possible to start the application in the AppVM - need to clarify the root cause.
 ```
-Template=debian-11-minimal
-TemplateName=t_debian-11-mail_v1
-qvm-clone $Template $TemplateName 
-qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt get update'
-qvm-run --auto --pass-io --no-gui --user root $TemplateName 'dpkg-reconfigure locales'
-qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt-get upgrade'
-qvm-run --auto --pass-io --no-gui --user root $TemplateName \
-   'apt-get install nano git qubes-usb-proxy qubes-gpg-split \
-    qubes-core-agent-networking pinentry-gtk dnsutils iptraf-ng \
-    zenity thunderbird thunderbird-qubes'
-qvm-run --auto --pass-io --no-gui --user root $TemplateName \
-   'apt-get install nano git qubes-usb-proxy qubes-gpg-split \
-    qubes-core-agent-networking  dnsutils iptraf-ng zenity \
-    thunderbird thunderbird-qubes'
-    
-# Download ProtonmailBridge and copy it to the TemplateVM
-qvm-run --auto --pass-io --no-gui --user root $TemplateName 'dpkg -i /home/user/QubesIncoming/*/protonmail-bridge*.deb'
-qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt --fix-broken install'
-qvm-run --auto --pass-io --no-gui --user root $TemplateName 'dpkg -i /home/user/QubesIncoming/*/protonmail-bridge*.deb'
-qvm-shutdown $TemplateName 
-MailAppVM=my-mail
-qvm-create --template=$TemplateName --label=blue $MailAppVM 
-
-```
-
-
-t-fedora-37-mail
-=================
-
-Unfortunately ProtonmailBridge seems to be broken in the latest version as it is not possible to start the application in the AppVM - need to clarify the root cause.
-```
-Template=fedora-33-minimal
-TemplateName=t-fedora-33-mail
-qvm-kill $TemplateName
-qvm-remove --force $TemplateName
+Template=debian-12-minimal
+TemplateName=t_debian-12-mail_v1
 qvm-clone $Template $TemplateName
 
+# Conigure locales
+qvm-run --auto --user root --pass-io --no-gui $TemplateName 'sudo apt-get -y install dialog'
+
+# Conigure locales
+qvm-run --auto --user root --pass-io --no-gui $TemplateName 'dpkg-reconfigure locales'
+# install the following locales: 72,97
+# 72 = de_DE.UTF-8
+# 97 = en_US.UTF-8 <- set this as default !
+
+ qvm-run --auto --pass-io --no-gui --user root $TemplateName 'apt-get update && apt-get upgrade'
 qvm-run --auto --pass-io --no-gui --user root $TemplateName \
-  'dnf -y update'
+   'apt-get install nano git qubes-usb-proxy qubes-gpg-split \
+    qubes-core-agent-networking dnsutils iptraf-ng \
+    zenity thunderbird thunderbird-qubes pinentry-gtk2 \
+    evolution evolution-ews nautilus'
+ 
+# Download ProtonmailBridge and copy it to the TemplateVM
+DownloadVM=my-work
 
+# Transfer .deb-package to the template-VM
+qvm-run --auto --pass-io --no-gui --user root $DownloadVM \
+	'cat /home/user/Downloads/protonmail*' \
+	| qvm-run	--auto --pass-io --no-gui --user root $TemplateName \
+		'cat - > /home/user/protonmail-bridge.deb'
+# Remove the downloaded .deb-file
 qvm-run --auto --pass-io --no-gui --user root $TemplateName \
-  'dnf install -y  nano git \
-  qubes-usb-proxy qubes-gpg-split qubes-core-agent-networking \
-  pinentry-gtk dnsutils iptraf-ng nano git zenity \
-  thunderbird thunderbird-qubes'
+                'rm /home/user/protonmail-bridge.deb'
+# Install Protonmail-Bridge
+qvm-run	--auto --pass-io --no-gui --user root $TemplateName \
+                'apt-get install /home/user/protonmail-bridge.deb'
 
-# installed before in fedora-36 based template: dnf-plugins-core polkit 
-
-# Install Protonmail Bridge
-# Download ProtonBridge in a disposable VM
-# https://proton.me/mail/bridge#download and choose the .rpm-package
-# Copy rpm-package from disposable VM to the mail-template VM
+# missing packages for protonbridge in AppVM
 qvm-run --auto --pass-io --no-gui --user root $TemplateName \
-  'dnf install -y /home/user/QubesIncoming/*/protonmail-bridge*.rpm'
+	"apt-get install -y \
+		libopengl0 pass libxcb-shape0 libxcb-render-util0 \
+		libxcb-image0  libxcb-icccm4  libxcb-keysyms1"
+#to setup pass:
+qvm-run --auto --pass-io --no-gui --user root $TemplateName \
+        "rm -Rf /home/user/.gnupg /home/user/.password-store"
+#Create keys with empty password with User Protonmail no@mail.com
+qvm-run --auto --pass-io --no-gui $TemplateName xterm
+# run two commands
+gpg --full-generate-key
+pass init no@mail.com
+gpg --list-keys
 
-qvm-shutdown $TemplateName 
+qvm-shutdown $TemplateName
 
 # Create your mail AppVM
 MailAppVM=my-mail
@@ -73,3 +66,4 @@ do
    qvm-firewall $MailAppVM add action=accept proto=tcp dsthost=$IP/32 dstports=443 comment="Allow ProtonmailBridge"
 done
 qvm-firewall $MailAppVM add action=drop comment="Drop everything else"
+```
