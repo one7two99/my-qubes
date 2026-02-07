@@ -1,4 +1,4 @@
-Howto setup a sys template based on Debian 12 minimal
+Howto setup a sys template based on Debian 13 minimal
 =====================================================
 
 This howto will explain how to build a template whoch can be used for sys-net, sys-usb, sys-firewall.
@@ -7,17 +7,19 @@ Additionally the template can also be used for a sys-vpn for VPN providers which
 It has been tested successfully with ProtonVPN using OpenVPN and MullvadVPN using Wireguard.
 
 ```
-template=debian-12-minimal
-systemplate=t_debian-12-sys_v1
+template=debian-13-minimal
+systemplate=t_debian-13-sys_v1
 
 #clone template
 qvm-clone $template $systemplate
 
 # Conigure locales
-qvm-run --auto --user root --pass-io --no-gui $systemplate 'dpkg-reconfigure locales'
+qvm-run --auto --user root --pass-io --no-gui $systemplate xterm
+# Run the following command in the terminal:
+dpkg-reconfigure locales
 # install the following locales: 72,97
 # 72 = de_DE.UTF-8
-# 97 = en_US.UTF-
+# 97 = en_US.UTF-8
 
 # update template
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
@@ -46,7 +48,7 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
         network-manager \
         qubes-core-agent-network-manager \
         firmware-iwlwifi \
-        modem-manager-gui '
+        modem-manager-gui'
 
 # for vpn-support
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
@@ -54,7 +56,7 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
         openvpn wireguard wireguard-tools resolvconf'
 
 # shutdown the template
-qvm-shutdown --wait systemplate
+qvm-shutdown --wait $systemplate
 
 #--- optional stuff, you might want in your sys-xxx templates
 
@@ -72,7 +74,7 @@ qvm-run --auto --user root --pass-io --no-gui $systemplate \
         network-manager-openvpn-gnome'
 
 # NOT NEEDED, only for for yubikey-support for login or lockscreen
-# you also need to install in dom0: qubes-yubikey-dom0
+# you also need to install in dom0 via: sudo qubes-dom0-update install qubes-yubikey-dom0
 qvm-run --auto --user root --pass-io --no-gui $systemplate \
   'apt-get install \
         yubikey-personalization'
@@ -87,7 +89,7 @@ See also: https://qubes-os.org/doc/disposable-customization
 Prepare disposable AppVM as template for (named) disposable sys-VMs
 -------------------------------------------------------------------
 ```
-sys_template=t_debian-12-sys_v1
+sys_template=t_debian-13-sys_v1
 dvm_sys_template=sys-dvm
 
 # create a disposable template for the sys-vms
@@ -144,15 +146,20 @@ dvm_sys_template=sys-dvm
 fwvm=sys-firewall
 netvm=sys-net
 
-qvm-create -C DispVM -l red --template $dvm_sys_template $fwvm
-qvm-prefs $fwvm memory 400
-qvm-prefs $fwvm maxmem 1024
-qvm-prefs $fwvm vcpus 1
-qvm-prefs $fwvm netvm $netvm
-qvm-prefs $fwvm autostart true
-qvm-prefs $fwvm provides_network true
-qvm-features $fwvm appmenus-dispvm ''
+# If you need to create a new sys-firewall vm
+#qvm-create -C DispVM -l red --template $dvm_sys_template $fwvm
+# change the setting of the firewall vm
+qvm-kill $fwvm 
+qvm-prefs --set $fwvm template $dvm_sys_template
+qvm-prefs --set $fwvm memory 400
+qvm-prefs --set $fwvm maxmem 1024
+qvm-prefs --set $fwvm vcpus 1
+qvm-prefs --set $fwvm netvm $netvm
+qvm-prefs --set $fwvm autostart true
+qvm-prefs --set $fwvm provides_network true
+qvm-features  $fwvm appmenus-dispvm ''
 qvm-service $fwvm network-manager off
+qvm-start $fwvm
 
 # disable old autostart of sys-firewall
 #qvm-prefs sys-firewall autostart false
@@ -167,9 +174,12 @@ Disposable sys-usb
 dvm_sys_template=sys-dvm
 usbvm=sys-usb
 
-qvm-create -C DispVM -l green --template $dvm_sys_template $usbvm
-qvm-prefs $usbvm virt_mode hvm
+# If you need to create a new sys-usb vm
+# qvm-create -C DispVM -l green --template $dvm_sys_template $usbvm
+# qvm-prefs $usbvm virt_mode hvm
 # qvm-prefs $appvm meminfo-writer off
+qvm-kill $usbvm
+qvm-prefs --set $usbvm template $dvm_sys_template
 qvm-prefs $usbvm memory 512
 qvm-prefs $usbvm maxmem 0
 qvm-prefs $usbvm vcpus 1
@@ -178,6 +188,7 @@ qvm-prefs $usbvm autostart true
 qvm-prefs $usbvm provides_network true
 qvm-service $usbvm network-manager off
 qvm-features $usbvm appmenus-dispvm ''
+qvm-start $usbvm
 
 # to find out PCI devices
 qvm-pci | grep "USB controller"
