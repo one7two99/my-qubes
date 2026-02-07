@@ -1,12 +1,11 @@
 Template for general a productivity VM
 ======================================
-
-Last updated 03/31/2023
+Tested on Qubes 4.3.0
 
 ## fedora based general AppVM
 ```
-Template=fedora-37-minimal
-TemplateName=t_fedora-37-apps_v1
+Template=fedora-42-minimal
+TemplateName=t_fedora-42-apps_v1
 
 qvm-kill $TemplateName
 qvm-remove --force $TemplateName
@@ -18,7 +17,6 @@ qvm-run --auto --pass-io --no-gui --user root $TemplateName 'dnf install -y \
 	qubes-usb-proxy \
 	qubes-gpg-split \
 	qubes-mgmt-salt-vm-connector \
-	zenity \
 	keepassxc \
 	klavaro \
 	libreoffice \
@@ -28,17 +26,18 @@ qvm-run --auto --pass-io --no-gui --user root $TemplateName 'dnf install -y \
 	nautilus \
 	qubes-core-agent-nautilus \
 	evince \
-	pinentry-gtk \
-	unzip \
-	nano \
 	emacs \
 	git \
 	mc \
 	less \
 	wget \
-	borgbackup \
-	restic \
-	curl'
+	borgmatic \
+	pipewire-qubes'
+
+qvm-shutdown $TemplateName
+
+# these packages are already installed in the default fedora-42-minimal template
+# unzip nano zenity curl pinentry
 
 # Not installed:
 #	nautilus-search-tool \
@@ -54,7 +53,7 @@ qvm-run --auto --pass-io --no-gui --user root $TemplateName 'dnf install -y \
 ### Set this template as Template for a disposable VM
 Create a new Disposable App-VM which is based on a custom template
 ```
-template4dvm=t_fedora-37-apps_v1
+template4dvm=t_fedora-42-apps_v1
 newdvmtemplatename=my-dvm
 qvm-create --template $template4dvm --label red --property template_for_dispvms=True --class=AppVM $newdvmtemplatename
 ```
@@ -66,6 +65,8 @@ Fix menu entry from Domain: my-dvm to Disposable: my-dvm
 qvm-features $newdvmtemplatename appmenus-dispvm 1
 qvm-sync-appmenus --regenerate-only $newdvmtemplatename
 ```
+
+
 ## debian 12 based general AppVM
 ```
 Template=debian-12-minimal
