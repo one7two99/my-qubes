@@ -17,6 +17,8 @@ qvm-run --auto --pass-io --no-gui --user root $TemplateName 'dnf install -y \
 	qubes-usb-proxy \
 	qubes-gpg-split \
 	qubes-mgmt-salt-vm-connector \
+	qubes-core-agent-passwordless-root \
+	qubes-core-agent-nautilus \
 	keepassxc \
 	klavaro \
 	libreoffice \
@@ -24,7 +26,6 @@ qvm-run --auto --pass-io --no-gui --user root $TemplateName 'dnf install -y \
 	gimp \
 	firefox \
 	nautilus \
-	qubes-core-agent-nautilus \
 	evince \
 	emacs \
 	git \
