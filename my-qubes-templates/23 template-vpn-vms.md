@@ -1,17 +1,20 @@
-sys-mullvad - Use MullvadVPN with Wireguard 
-===========================================
+sys-protonvpn - Use ProtonVPN with Wireguard 
+============================================
 
-MullvadVPN is an excellent VPN Provider which is easy to setup has a simple and fair pricing modell, which doesn't offer huge and unrealistic discount and isn't interesting in collecting data about you.
+MullvadVPN and also ProtonVPN are excellent VPN Providers which are easy to setup.
+ProtonVPN can also be bought via the Proton Unlimited Bundle.
+MullvadVPN has a simple and fair pricing modell, which doesn't offer huge and unrealistic discounts
+and isn't interesting in collecting data about you.
 You can use Mullvad without giving any personal details and pay by cash, crypto and all other common methods.
 
-sys-mullvad will be based on my minimal sys-template, which is an adapted clone of debian-12-minimal.
+The VPN Qube will be based on my minimal sys-template, which is an adapted clone of debian-13-minimal.
 Howto to build this sys-template is covered here:
 https://github.com/one7two99/my-qubes/blob/master/my-qubes-templates/20%20debian-based-sys-vms.md
 
 ```
-mytemplate=t_debian-12-sys_v1
-vpnvm=sys-mullvad
-netvm=sys-fw-1
+mytemplate=t_debian-13-sys_v1
+vpnvm=sys-vpn
+netvm=sys-firewall
 
 # Create vpn NetVM
 qvm-create -l orange --template $mytemplate $vpnvm
@@ -25,64 +28,59 @@ qvm-prefs $vpnvm provides_network true
 # Create a wireguard-config file and copy it to vpnvm
 # Assume that you downloaded the wireguard-config file to the Downloads folder
 downloadvm=my-untrusted
-# Copy the file from your "downloadvm" to /home/user/wireguard.conf in the VPNVM
+# Copy the file from your "downloadvm" to /home/user/wireguard.conf in the VPN-VM
+# rename the file to wireguard.conf if is has another name.
 qvm-run --pass-io --no-gui $downloadvm \
-        'cat ~/Downloads/*-wg-*.conf' \
-        | qvm-run --pass-io --no-gui $vpnvm \
-                "cat - > /home/user/wireguard.conf"
+        'cat ~/Downloads/wireguard.conf' \
+         | qvm-run --pass-io --no-gui $vpnvm \
+             "cat - > /home/user/wireguard.conf"
 
-# Launch Wireguard and make a connection test
-qvm-run --pass-io --no-gui --user=root $vpnvm "wg-quick up /home/user/wireguard.conf"
-# Check if connected
-qvm-run --pass-io --no-gui $vpnvm "curl https://am.i.mullvad.net/connected"
-# Stop Wireguard
-qvm-run --pass-io --no-gui --user=root $vpnvm "wg-quick down /home/user/wireguard.conf"
-# Check if unconnected / should show a different IP than beeing connected
-qvm-run --pass-io --no-gui $vpnvm "curl https://am.i.mullvad.net/connected"
-
-# let wireguard connect automatically when starting up the NetVM
-qvm-run --pass-io --no-gui --user=root $vpnvm "echo wg-quick up /home/user/wireguard.conf >> /rw/config/rc.>
-# Restart the NetVM
-qvm-shutdown --wait $vpnvm
-# Check if connected to Mullvad after boot
-qvm-run --auto --pass-io --no-gui $vpnvm "curl https://am.i.mullvad.net/connected"
-
-# Start another AppVM and set the Mullvad Proxy as NetVM for this VM
-# Try to connect to the internet using this VM
-qvm-run --auto --pass-io --no-gui OTHERAPPVMNAME "curl https://am.i.mullvad.net/connected"
-
-# Only allow outbound traffic from your Mullvad VPN proxy to mullvad's VPN server
-# get the wireguard IP-address from your wireguard config file from the line starting with Endpoint
+# only allow traffic to the VPN-VM
+# show the VPN-IP from the wireguard config-file
 qvm-run --pass-io --no-gui $vpnvm "cat /home/user/wireguard.conf" | grep Endpoint
-# Change this to the correct IP (see outout of above command)
-wireguardip=185.213.154.68
-# reset firewall rules
-qvm-firewall $vpnvm reset
-# delete the default "Allow all" rule
+# set the wireguard IP
+wireguardip=79.135.104.69
+# reset firewall
+qvm-firewall sys-vpn reset
+# delete the default role
 qvm-firewall $vpnvm del --rule-no 0
-# Allow only outbound Mullvad connection
-qvm-firewall $vpnvm add action=accept dsthost=$wireguardip/32 comment="Allow Mullvad"
-# Block everything else
+# only allow traffic to the VPN-IP
+qvm-firewall $vpnvm add action=accept dsthost=$wireguardip/32 comment="Allow ProtonVPN via Wireguard"
 qvm-firewall $vpnvm add action=drop comment="Drop everything else"
-# List the new rules
 qvm-firewall $vpnvm list
 
+# Enable network-manager in the vpn-vm
+qvm-service --enable $vpnvm network-manager
+
+# Restart the vm
+qvm-shutdown --wait $vpnvm
+qvm-start $vpnvm
+
+# Import wireguard-config in network-manager
+qvm-run --pass-io --user=root $vpnvm "nmcli connection import type wireguard file /home/user/wireguard.conf"
+
+# launch the vpn connection on startup
+qvm-run --pass-io --no-gui --user=root sys-protonvpn "echo nmcli connection up wireguard >> /rw/config/rc.local"
+
 # Test Leakage protection
-# Open a new dom0-Terminal and ping from your APPVM
-qvm-run --pass-io --no-gui YOURAPPVM "ping 8.8.8.8"
-
-# Disconnect the wireguard connection and the ping in your AppVM should stop working
-qvm-run --pass-io --no-gui --user=root $vpnvm "wg-quick down /home/user/wireguard.conf"
-
-# To setup DNS Hijacking Rules see: https://mullvad.net/en/help/wireguard-on-qubes-os/
-# I am using a sys-pihole Proxy with unbound and NextDNS as such I have a different setup
-
-# Happy MullvadVPN'ing :-)
+# connect to vpn
+qvm-run --pass-io --user=root $vpnvm "nmcli connection up wireguard"
+# Check if connected
+qvm-run --pass-io --no-gui $vpnvm "curl https://am.i.mullvad.net/connected"
+# Open a new dom0-Terminal and ping from another appvm
+anotherappvm=my-untrusted
+sysvpn=sys-vpn
+# set vpn as netvm
+qvm-prefs --set $anotherappvm netvm sys-vpn
+# ping to google dns as test in the appvm (ping 8.8.8.8)
+qvm-run --pass-io --no-gui $vpnvm "ping 8.8.8.8"
+# In the other window: disconnect wireguard connection -> ping in your AppVM should stop working
+qvm-run --pass-io --user=root $vpnvm "nmcli connection down wireguard"
 ```
-
 
 Use ProtonVPN in Qubes via an OpenVPN NetVM
 ===========================================
+INFO: this howto is not up to date for debian-13 as wireguard is the superior vpn protocol for me.
 
 This "sys-protonvpn" will act as a NetVM (VPN-Proxy) for all Qubes which are using this qubes as NetVM.
 It's based on my t_debian-11-sys template which is itself based on a customized debian-11-minimal template.
