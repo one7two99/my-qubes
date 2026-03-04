@@ -7,10 +7,15 @@ MullvadVPN has a simple and fair pricing modell, which doesn't offer huge and un
 and isn't interesting in collecting data about you.
 You can use Mullvad without giving any personal details and pay by cash, crypto and all other common methods.
 
+The way I have setup my VPNs:
+```
+sys-net <- sys-fw1 <- sys-vpn <- sys-fw2 <- AppVMs via VPN
+sys-net <- sys-fw1 <- AppVMs direct connection
+```
+
 The VPN Qube will be based on my minimal sys-template, which is an adapted clone of debian-13-minimal.
 Howto to build this sys-template is covered here:
 https://github.com/one7two99/my-qubes/blob/master/my-qubes-templates/20%20debian-based-sys-vms.md
-
 ```
 mytemplate=t_debian-13-sys_v1
 vpnvm=sys-vpn
